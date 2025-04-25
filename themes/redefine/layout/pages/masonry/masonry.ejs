@@ -1,9 +1,37 @@
+<%
+// Define an array of images to display in the masonry layout
+const images = theme.masonry;
+
+// Get three random images from the array
+const randomImages = [];
+const imagesCopy = [...images]; // Create a copy to avoid modifying the original array
+
+// Get 3 random images or all images if less than 3 are available
+for (let i = 0; i < 3 && imagesCopy.length > 0; i++) {
+  const randomIndex = Math.floor(Math.random() * imagesCopy.length);
+  randomImages.push(imagesCopy[randomIndex]);
+  imagesCopy.splice(randomIndex, 1); // Remove the selected image to avoid duplicates
+}
+%>
+
 <h1 class="page-title-header">
     <%- getPageTitle(page) %>
 </h1>
 
-<h4>瀑布流图片展示</h4>
+<h4>第一次打开好像不能自动显示，要刷新一下此页面才行，暂时还没找到具体原因，后面再修复吧。</h4>
 <br>
+
+<div id="masonry-container">
+	<% randomImages.forEach(function(image) { %>
+	<div class="masonry-item">
+		<div class="image-container">
+			<img src="<%- image.image %>" alt="<%- image.title %>">
+			<div class="image-title"><%- image.title %></div>
+			<div class="image-description"><%- image.description %></div>
+		</div>
+	</div>
+	<% }); %>
+</div>
 
 <div id="loading-placeholder" class="loading-placeholder">
     <div class="flex-grid generic-card" style="display: none; flex-wrap: wrap; gap: 5px; width: 100%;">
