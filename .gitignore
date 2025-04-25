@@ -1,0 +1,10 @@
+.DS_Store
+Thumbs.db
+DEVELOP.md
+db.json
+*.log
+node_modules/
+src/
+public/
+.deploy*/
+_multiconfig.yml
