@@ -240,6 +240,8 @@
                     // 点击背景或关闭按钮关闭查看器
                     viewer.querySelector('.viewer-backdrop').addEventListener('click', closeViewer);
                     viewer.querySelector('.viewer-close').addEventListener('click', closeViewer);
+					viewer.querySelector('.viewer-backdrop').addEventListener('click', closeViewer2);
+					viewer.querySelector('.viewer-close').addEventListener('click', closeViewer2);
                 }
                 
                 // 为所有图片容器添加点击事件，包括已存在的和未来加载的
@@ -266,12 +268,18 @@
             }
             
             // 关闭图片查看器
-            function closeViewer() {
-                const viewer = document.getElementById('image-viewer');
-                viewer.classList.remove('active');
-                document.body.style.overflow = ''; // 恢复滚动
-            }
-            
+			function closeViewer() {
+			    const viewer = document.getElementById('image-viewer');
+			    viewer.classList.remove('active');
+			    document.body.style.overflow = ''; // 恢复滚动
+			}
+			
+			function closeViewer2() {
+			    const viewer = document.getElementById('image-viewer-container');
+			    viewer.classList.remove('active');
+			    document.body.style.overflow = '';
+			}
+			
             // 加载更多图片
             function loadMoreImages() {
                 // 每次加载前，对剩余的图片重新洗牌
