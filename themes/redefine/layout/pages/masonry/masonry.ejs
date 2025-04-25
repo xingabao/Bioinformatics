@@ -1,18 +1,8 @@
 <%
 // Define an array of images to display in the masonry layout
-let images = [];
-try {
-  images = theme.masonry || [];
-  if (!Array.isArray(images)) {
-    images = [];
-    console.warn('theme.masonry is not an array, using empty array instead');
-  }
-} catch (e) {
-  console.error('Error accessing theme.masonry:', e);
-}
-
+const images = theme.masonry;
 // 初始加载的图片数量
-const initialLoadCount = Math.min(10, images.length);
+const initialLoadCount = 10;
 %>
 
 <h1 class="page-title-header">
@@ -20,12 +10,12 @@ const initialLoadCount = Math.min(10, images.length);
 </h1>
 
 <div class="loading-placeholder">
-    <div class="flex-grid generic-card">
-        <div class="card loading"></div>
-        <div class="card loading"></div>
-        <div class="card loading"></div>
-        <div class="card loading"></div>
-    </div>
+	<div style="display: none; flex-wrap: wrap; gap: 5px; width: 100%;" class="flex-grid generic-card">
+		<div style="flex: 1 0 calc(25% - 5px); height: 200px; min-width: 150px; background-color: #FFFFFF; border-radius: 5px; position: relative; overflow: hidden;" class="card loading"></div>
+		<div style="flex: 1 0 calc(25% - 5px); height: 200px; min-width: 150px; background-color: #FFFFFF; border-radius: 5px; position: relative; overflow: hidden;" class="card loading"></div>
+		<div style="flex: 1 0 calc(25% - 5px); height: 200px; min-width: 150px; background-color: #FFFFFF; border-radius: 5px; position: relative; overflow: hidden;" class="card loading"></div>
+		<div style="flex: 1 0 calc(25% - 5px); height: 200px; min-width: 150px; background-color: #FFFFFF; border-radius: 5px; position: relative; overflow: hidden;" class="card loading"></div>
+	</div>
 </div>
 
 <div class="masonry-grid-container">
@@ -37,23 +27,9 @@ const initialLoadCount = Math.min(10, images.length);
 </div>
 
 <script>
-    // 确保脚本在DOM完全加载后执行
-    (function() {
+    document.addEventListener('DOMContentLoaded', function() {
         // 获取所有图片数据
-        let allImages = [];
-        try {
-            allImages = <%- JSON.stringify(images || []) %>;
-            if (!Array.isArray(allImages) || allImages.length === 0) {
-                console.warn('No images found or images is not an array');
-                // 可以在这里设置一些默认图片或显示提示
-                document.querySelector('.loading-placeholder').innerHTML = '<p>No images available</p>';
-                document.getElementById('load-more-btn').style.display = 'none';
-                return;
-            }
-        } catch (e) {
-            console.error('Error parsing images:', e);
-            return;
-        }
+        let allImages = <%- JSON.stringify(images) %>;
         
         // 打乱图片数组顺序
         function shuffleArray(array) {
@@ -78,14 +54,12 @@ const initialLoadCount = Math.min(10, images.length);
         const loadMoreBtn = document.getElementById('load-more-btn');
         const loadingPlaceholder = document.querySelector('.loading-placeholder');
         
-        // 隐藏加载占位符，显示网格
+        // 隐藏加载占位符
         function hideLoadingPlaceholder() {
             if (loadingPlaceholder) {
                 loadingPlaceholder.style.display = 'none';
             }
-            if (masonryGrid) {
-                masonryGrid.style.display = 'grid';
-            }
+            masonryGrid.style.display = 'grid';
         }
         
         // 创建图片元素
@@ -111,13 +85,8 @@ const initialLoadCount = Math.min(10, images.length);
             const tempImg = new Image();
             tempImg.onload = function() {
                 const actualRatio = tempImg.width / tempImg.height;
-                const container = item.querySelector('.image-container');
-                if (container) {
-                    container.style.paddingBottom = `${(1/actualRatio) * 100}%`;
-                    setTimeout(() => {
-                        setRowSpan(item);
-                    }, 0);
-                }
+                item.querySelector('.image-container').style.paddingBottom = `${(1/actualRatio) * 100}%`;
+                setRowSpan(item);
             };
             tempImg.src = imageData.image;
             
@@ -127,9 +96,7 @@ const initialLoadCount = Math.min(10, images.length);
         // 设置行跨度
         function setRowSpan(item) {
             const container = item.querySelector('.image-container');
-            if (!container) return;
-            
-            const rowHeight = 40; // 与CSS中的grid-auto-rows保持一致
+            const rowHeight = 55; // 与CSS中的grid-auto-rows保持一致
             const contentHeight = container.offsetHeight;
             const rowSpan = Math.ceil(contentHeight / rowHeight);
             item.style.gridRow = `span ${rowSpan}`;
@@ -139,7 +106,7 @@ const initialLoadCount = Math.min(10, images.length);
         function setupLazyLoading() {
             const lazyImages = document.querySelectorAll('.lazy-image');
             
-            if ('IntersectionObserver' in window && lazyImages.length > 0) {
+            if ('IntersectionObserver' in window) {
                 const imageObserver = new IntersectionObserver((entries) => {
                     entries.forEach(entry => {
                         if (entry.isIntersecting) {
@@ -152,11 +119,9 @@ const initialLoadCount = Math.min(10, images.length);
                                 img.classList.remove('lazy-image', 'loading');
                                 // 图片加载后微调布局
                                 const item = img.closest('.masonry-item');
-                                if (item) {
-                                    requestAnimationFrame(() => {
-                                        setRowSpan(item);
-                                    });
-                                }
+                                requestAnimationFrame(() => {
+                                    setRowSpan(item);
+                                });
                                 
                                 // 隐藏占位符
                                 const placeholder = img.previousElementSibling;
@@ -183,9 +148,7 @@ const initialLoadCount = Math.min(10, images.length);
                     img.onload = function() {
                         img.classList.remove('lazy-image', 'loading');
                         const item = img.closest('.masonry-item');
-                        if (item) {
-                            setRowSpan(item);
-                        }
+                        setRowSpan(item);
                         
                         // 隐藏占位符
                         const placeholder = img.previousElementSibling;
@@ -209,7 +172,6 @@ const initialLoadCount = Math.min(10, images.length);
             
             const endIndex = Math.min(currentIndex + batchSize, allImages.length);
             
-            // 添加新图片到网格
             for (let i = currentIndex; i < endIndex; i++) {
                 if (allImages[i]) {
                     const imageElement = createImageElement(allImages[i]);
@@ -221,9 +183,7 @@ const initialLoadCount = Math.min(10, images.length);
             currentIndex = endIndex;
             
             // 启用懒加载
-            setTimeout(() => {
-                setupLazyLoading();
-            }, 100);
+            setupLazyLoading();
             
             // 如果所有图片都已加载，隐藏"加载更多"按钮
             if (currentIndex >= allImages.length) {
@@ -252,14 +212,9 @@ const initialLoadCount = Math.min(10, images.length);
             loadMoreImages();
         }
         
-        // 确保页面加载完成后执行初始化
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', init);
-        } else {
-            // 如果DOM已经加载完成，直接执行初始化
-            init();
-        }
-    })();
+        // 开始初始化
+        init();
+    });
 </script>
 
 <style>
@@ -394,9 +349,8 @@ const initialLoadCount = Math.min(10, images.length);
     }
     
     .card.loading {
-        flex: 1 0 calc(25% - 5px);
+        width: 300px;
         height: 200px;
-        min-width: 150px;
         background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
         background-size: 200% 100%;
         animation: loading-animation 1.5s infinite;
