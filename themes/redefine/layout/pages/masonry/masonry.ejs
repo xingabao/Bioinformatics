@@ -143,7 +143,7 @@
                     
                     item.innerHTML = `
                         <div class="image-container" data-full-image="${imageData.image}">
-                            <div class="image-loading-spinner"></div>
+                            <div class="image-placeholder"></div>
                             <img data-src="${imageData.image}" alt="${imageData.title || ''}" class="lazy-image">
                             <div class="image-overlay">
                                 <div class="image-title">${imageData.title || ''}</div>
@@ -174,16 +174,14 @@
                     }
                     
                     function onImageLoad(img) {
-                        img.classList.remove('lazy-image');
+                        img.classList.remove('lazy-image', 'loading');
                         const item = img.closest('.masonry-item');
                         utils.setRowSpan(item);
                         
-                        const spinner = img.previousElementSibling;
-                        if (spinner?.classList.contains('image-loading-spinner')) {
-                            spinner.style.display = 'none';
+                        const placeholder = img.previousElementSibling;
+                        if (placeholder?.classList.contains('image-placeholder')) {
+                            placeholder.style.display = 'none';
                         }
-                        
-                        img.style.opacity = 1;
                         
                         if (++loadedCount >= totalToLoad) {
                             utils.setLoadingState(false);
@@ -195,17 +193,9 @@
                             entries.forEach(entry => {
                                 if (entry.isIntersecting) {
                                     const img = entry.target;
-                                    const container = img.closest('.image-container');
-                                    
-                                    // 显示加载动画
-                                    const spinner = container.querySelector('.image-loading-spinner');
-                                    spinner.style.display = 'block';
-                                    
+                                    img.classList.add('loading');
                                     img.onload = () => onImageLoad(img);
-                                    img.onerror = () => {
-                                        spinner.style.display = 'none';
-                                        loadedCount++;
-                                    };
+                                    img.onerror = () => loadedCount++;
                                     img.src = img.dataset.src;
                                     imageObserver.unobserve(img);
                                 }
@@ -215,15 +205,9 @@
                         lazyImages.forEach(img => imageObserver.observe(img));
                     } else {
                         lazyImages.forEach(img => {
-                            const container = img.closest('.image-container');
-                            const spinner = container.querySelector('.image-loading-spinner');
-                            spinner.style.display = 'block';
-                            
+                            img.classList.add('loading');
                             img.onload = () => onImageLoad(img);
-                            img.onerror = () => {
-                                spinner.style.display = 'none';
-                                loadedCount++;
-                            };
+                            img.onerror = () => loadedCount++;
                             img.src = img.dataset.src;
                         });
                     }
@@ -322,24 +306,16 @@
         transform: translateY(-5px);
     }
     
-    /* 加载动画转圈圈 */
-    .image-loading-spinner {
+    .image-placeholder {
         position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 40px;
-        height: 40px;
-        border: 4px solid rgba(0, 0, 0, 0.1);
-        border-left-color: #3498db;
-        border-radius: 50%;
-        animation: spinner-rotate 1s linear infinite;
-        z-index: 3;
-    }
-    
-    @keyframes spinner-rotate {
-        0% { transform: translate(-50%, -50%) rotate(0deg); }
-        100% { transform: translate(-50%, -50%) rotate(360deg); }
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: loading-animation 1.5s infinite;
+        z-index: 1;
     }
     
     .image-container img {
@@ -422,7 +398,7 @@
         justify-content: center;
     }
     
-    .card.loading {
+    .card.loading, .image-placeholder {
         background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
         background-size: 200% 100%;
         animation: loading-animation 1.5s infinite;
@@ -513,12 +489,6 @@
         
         #viewer-image {
             max-height: 80vh;
-        }
-        
-        .image-loading-spinner {
-            width: 30px;
-            height: 30px;
-            border-width: 3px;
         }
     }
 </style>
