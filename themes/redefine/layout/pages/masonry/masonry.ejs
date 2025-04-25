@@ -9,12 +9,13 @@ const initialLoadCount = 5;
     <%- getPageTitle(page) %>
 </h1>
 
-<div class="loading-placeholder" style="display: none;">
-    <div class="flex-grid generic-card">
-        <div class="card loading"></div>
-        <div class="card loading"></div>
-        <div class="card loading"></div>
-    </div>
+<div class="loading-placeholder"">
+	<div style="display: flex; flex-wrap: wrap; gap: 5px; width: 100%;" class="flex-grid generic-card">
+		<div style="flex: 1 0 calc(25% - 5px); height: 100px; min-width: 150px; background-color: #f0f0f0; border-radius: 5px; position: relative; overflow: hidden;" class="card loading"></div>
+		<div style="flex: 1 0 calc(25% - 5px); height: 100px; min-width: 150px; background-color: #f0f0f0; border-radius: 5px; position: relative; overflow: hidden;" class="card loading"></div>
+		<div style="flex: 1 0 calc(25% - 5px); height: 100px; min-width: 150px; background-color: #f0f0f0; border-radius: 5px; position: relative; overflow: hidden;" class="card loading"></div>
+		<div style="flex: 1 0 calc(25% - 5px); height: 100px; min-width: 150px; background-color: #f0f0f0; border-radius: 5px; position: relative; overflow: hidden;" class="card loading"></div>
+	</div>
 </div>
 
 <div class="masonry-grid-container">
