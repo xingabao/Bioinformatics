@@ -2,7 +2,13 @@
     <%- getPageTitle(page) %>
 </h1>
 
+<%
+// Define an array of images to display in the masonry layout
+const images = theme.masonry;
+%>
+
 <h4>第一次打开好像不能自动显示，要刷新一下此页面才行，暂时还没找到具体原因，后面再修复吧。</h4>
+<h4>图片比较多，每次随机出现 5 个图片，目前一共 <%- images.length %> 个图片</h4>
 <br>
 
 <div id="loading-placeholder" class="loading-placeholder">
