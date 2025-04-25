@@ -1,69 +1,86 @@
-<%
-// Define an array of images to display in the masonry layout
-const images = theme.masonry;
-// 初始加载的图片数量
-const initialLoadCount = 10;
-%>
-
-<h1 class="page-title-header">
-    <%- getPageTitle(page) %>
-</h1>
-
-<div class="loading-placeholder">
-	<div style="display: none; flex-wrap: wrap; gap: 5px; width: 100%;" class="flex-grid generic-card">
-		<div style="flex: 1 0 calc(25% - 5px); height: 200px; min-width: 150px; background-color: #FFFFFF; border-radius: 5px; position: relative; overflow: hidden;" class="card loading"></div>
-		<div style="flex: 1 0 calc(25% - 5px); height: 200px; min-width: 150px; background-color: #FFFFFF; border-radius: 5px; position: relative; overflow: hidden;" class="card loading"></div>
-		<div style="flex: 1 0 calc(25% - 5px); height: 200px; min-width: 150px; background-color: #FFFFFF; border-radius: 5px; position: relative; overflow: hidden;" class="card loading"></div>
-		<div style="flex: 1 0 calc(25% - 5px); height: 200px; min-width: 150px; background-color: #FFFFFF; border-radius: 5px; position: relative; overflow: hidden;" class="card loading"></div>
-	</div>
-</div>
-
-<div class="masonry-grid-container">
-    <div id="masonry-grid"></div>
-</div>
-
-<div class="load-more-container">
-    <button id="load-more-btn" class="load-more-btn">加载更多</button>
-</div>
-
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // 获取所有图片数据
-        let allImages = <%- JSON.stringify(images) %>;
+    // 全局变量，确保在所有地方都可用
+    let masonryGrid, loadMoreBtn, loadingPlaceholder;
+    let allImages = <%- JSON.stringify(images) %>;
+    let currentIndex = 0;
+    const batchSize = <%= initialLoadCount %>;
+
+    // 在脚本顶部定义初始化函数，并立即尝试执行
+    function initializeMasonry() {
+        console.log("初始化瀑布流布局...");
+        
+        // 获取DOM元素
+        masonryGrid = document.getElementById('masonry-grid');
+        loadMoreBtn = document.getElementById('load-more-btn');
+        loadingPlaceholder = document.querySelector('.loading-placeholder');
+        
+        if (!masonryGrid || !loadMoreBtn) {
+            console.error("无法找到必要的DOM元素，将在100ms后重试");
+            setTimeout(initializeMasonry, 100);
+            return;
+        }
+        
+        // 确保我们有图片数据
+        if (!allImages || !Array.isArray(allImages) || allImages.length === 0) {
+            console.error("图片数据无效:", allImages);
+            return;
+        }
+        
+        console.log(`找到 ${allImages.length} 张图片`);
         
         // 打乱图片数组顺序
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-        
-        // 初始化时随机排序图片
         allImages = shuffleArray(allImages);
         
-        // 当前已加载的图片索引
-        let currentIndex = 0;
-        
-        // 每次加载的图片数量
-        const batchSize = <%= initialLoadCount %>;
-        
-        // 获取容器
-        const masonryGrid = document.getElementById('masonry-grid');
-        const loadMoreBtn = document.getElementById('load-more-btn');
-        const loadingPlaceholder = document.querySelector('.loading-placeholder');
-        
         // 隐藏加载占位符
-        function hideLoadingPlaceholder() {
-            if (loadingPlaceholder) {
-                loadingPlaceholder.style.display = 'none';
-            }
+        hideLoadingPlaceholder();
+        
+        // 设置事件监听器
+        loadMoreBtn.addEventListener('click', function() {
+            console.log("加载更多按钮被点击");
+            loadMoreImages();
+        });
+        
+        // 初始加载第一批图片
+        loadMoreImages();
+        
+        // 窗口大小调整处理
+        let resizeTimeout;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                // 重新计算所有已加载图片的行跨度
+                document.querySelectorAll('.masonry-item').forEach(item => {
+                    setRowSpan(item);
+                });
+            }, 100);
+        });
+        
+        console.log("瀑布流布局初始化完成");
+    }
+    
+    // 打乱图片数组顺序
+    function shuffleArray(array) {
+        const newArray = [...array]; // 创建副本以避免修改原数组
+        for (let i = newArray.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+        }
+        return newArray;
+    }
+    
+    // 隐藏加载占位符
+    function hideLoadingPlaceholder() {
+        if (loadingPlaceholder) {
+            loadingPlaceholder.style.display = 'none';
+        }
+        if (masonryGrid) {
             masonryGrid.style.display = 'grid';
         }
-        
-        // 创建图片元素
-        function createImageElement(imageData) {
+    }
+    
+    // 创建图片元素
+    function createImageElement(imageData) {
+        try {
             const item = document.createElement('div');
             item.className = 'masonry-item';
             
@@ -83,28 +100,46 @@ const initialLoadCount = 10;
             
             // 预加载图片以获取准确尺寸
             const tempImg = new Image();
+            tempImg.onerror = function() {
+                console.error("图片加载失败:", imageData.image);
+            };
             tempImg.onload = function() {
                 const actualRatio = tempImg.width / tempImg.height;
-                item.querySelector('.image-container').style.paddingBottom = `${(1/actualRatio) * 100}%`;
-                setRowSpan(item);
+                const container = item.querySelector('.image-container');
+                if (container) {
+                    container.style.paddingBottom = `${(1/actualRatio) * 100}%`;
+                    setRowSpan(item);
+                }
             };
             tempImg.src = imageData.image;
             
             return item;
+        } catch (error) {
+            console.error("创建图片元素时出错:", error);
+            return document.createElement('div'); // 返回空元素避免崩溃
         }
-        
-        // 设置行跨度
-        function setRowSpan(item) {
+    }
+    
+    // 设置行跨度
+    function setRowSpan(item) {
+        try {
             const container = item.querySelector('.image-container');
-            const rowHeight = 55; // 与CSS中的grid-auto-rows保持一致
+            if (!container) return;
+            
+            const rowHeight = 40; // 与CSS中的grid-auto-rows保持一致
             const contentHeight = container.offsetHeight;
-            const rowSpan = Math.ceil(contentHeight / rowHeight);
+            const rowSpan = Math.max(1, Math.ceil(contentHeight / rowHeight));
             item.style.gridRow = `span ${rowSpan}`;
+        } catch (error) {
+            console.error("设置行跨度时出错:", error);
         }
-        
-        // 懒加载图片
-        function setupLazyLoading() {
+    }
+    
+    // 懒加载图片
+    function setupLazyLoading() {
+        try {
             const lazyImages = document.querySelectorAll('.lazy-image');
+            console.log(`设置${lazyImages.length}张图片的懒加载`);
             
             if ('IntersectionObserver' in window) {
                 const imageObserver = new IntersectionObserver((entries) => {
@@ -119,15 +154,22 @@ const initialLoadCount = 10;
                                 img.classList.remove('lazy-image', 'loading');
                                 // 图片加载后微调布局
                                 const item = img.closest('.masonry-item');
-                                requestAnimationFrame(() => {
-                                    setRowSpan(item);
-                                });
+                                if (item) {
+                                    requestAnimationFrame(() => {
+                                        setRowSpan(item);
+                                    });
+                                }
                                 
                                 // 隐藏占位符
                                 const placeholder = img.previousElementSibling;
                                 if (placeholder && placeholder.classList.contains('image-placeholder')) {
                                     placeholder.style.display = 'none';
                                 }
+                            };
+                            
+                            img.onerror = function() {
+                                console.error("无法加载图片:", img.dataset.src);
+                                img.classList.remove('loading');
                             };
                             
                             img.src = img.dataset.src;
@@ -148,7 +190,9 @@ const initialLoadCount = 10;
                     img.onload = function() {
                         img.classList.remove('lazy-image', 'loading');
                         const item = img.closest('.masonry-item');
-                        setRowSpan(item);
+                        if (item) {
+                            setRowSpan(item);
+                        }
                         
                         // 隐藏占位符
                         const placeholder = img.previousElementSibling;
@@ -156,13 +200,29 @@ const initialLoadCount = 10;
                             placeholder.style.display = 'none';
                         }
                     };
+                    img.onerror = function() {
+                        console.error("无法加载图片:", img.dataset.src);
+                        img.classList.remove('loading');
+                    };
                     img.src = img.dataset.src;
                 });
             }
+        } catch (error) {
+            console.error("设置懒加载时出错:", error);
         }
-        
-        // 加载更多图片
-        function loadMoreImages() {
+    }
+    
+    // 加载更多图片
+    function loadMoreImages() {
+        try {
+            console.log(`加载更多图片: 当前索引=${currentIndex}, 总数=${allImages.length}`);
+            
+            // 确保masonryGrid存在
+            if (!masonryGrid) {
+                console.error("无法找到masonry-grid元素");
+                return;
+            }
+            
             // 每次加载前，对剩余的图片重新洗牌
             if (currentIndex < allImages.length) {
                 const remainingImages = allImages.slice(currentIndex);
@@ -171,6 +231,7 @@ const initialLoadCount = 10;
             }
             
             const endIndex = Math.min(currentIndex + batchSize, allImages.length);
+            console.log(`加载从${currentIndex}到${endIndex}的图片`);
             
             for (let i = currentIndex; i < endIndex; i++) {
                 if (allImages[i]) {
@@ -186,195 +247,33 @@ const initialLoadCount = 10;
             setupLazyLoading();
             
             // 如果所有图片都已加载，隐藏"加载更多"按钮
-            if (currentIndex >= allImages.length) {
+            if (currentIndex >= allImages.length && loadMoreBtn) {
                 loadMoreBtn.style.display = 'none';
             }
+        } catch (error) {
+            console.error("加载更多图片时出错:", error);
         }
-        
-        // 窗口大小调整处理
-        let resizeTimeout;
-        window.addEventListener('resize', function() {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => {
-                // 重新计算所有已加载图片的行跨度
-                document.querySelectorAll('.masonry-item').forEach(item => {
-                    setRowSpan(item);
-                });
-            }, 100);
-        });
-        
-        // 加载更多按钮点击事件
-        loadMoreBtn.addEventListener('click', loadMoreImages);
-        
-        // 初始化
-        function init() {
-            hideLoadingPlaceholder();
-            loadMoreImages();
-        }
-        
-        // 开始初始化
-        init();
-    });
-</script>
+    }
 
-<style>
-    .masonry-grid-container {
-        width: 100%;
-        padding: 0 10px;
-        box-sizing: border-box;
-    }
+    // 尝试多种初始化方法，确保脚本在页面加载后执行
+    // 方法1: DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("DOMContentLoaded 已触发");
+        initializeMasonry();
+    });
     
-    #masonry-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        grid-auto-rows: 40px;
-        grid-gap: 20px; /* 添加间距防止重叠 */
-        width: 100%;
-        margin-bottom: 30px;
-        position: relative; /* 确保定位正确 */
-    }
+    // 方法2: window.onload
+    window.onload = function() {
+        console.log("window.onload 已触发");
+        initializeMasonry();
+    };
     
-    .masonry-item {
-        width: 100%;
-        margin-bottom: 0;
-        break-inside: avoid;
-        position: relative;
-        padding: 0px; /* 添加内边距增加元素间距 */
-        box-sizing: border-box;
-    }
-    
-    .image-container {
-        position: relative;
-        overflow: hidden;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease;
-        background-color: #f5f5f5;
-        /* 添加这些属性来维持宽高比 */
-        width: 100%;
-        height: 0; /* 高度将通过padding-bottom来控制 */
-    }
-    
-    .image-container:hover {
-        transform: translateY(-5px);
-    }
-    
-    .image-placeholder {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-        background-size: 200% 100%;
-        animation: loading-animation 1.5s infinite;
-        z-index: 1;
-    }
-    
-    .image-container img {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover; /* 保持图片比例并填充容器 */
-        z-index: 2;
-    }
-    
-    .lazy-image {
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-    
-    img:not(.lazy-image) {
-        opacity: 1;
-    }
-    
-    .image-overlay {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
-        padding: 20px 10px 10px;
-        box-sizing: border-box;
-        z-index: 3;
-    }
-    
-    .image-title {
-        color: white;
-        font-weight: bold;
-        margin-bottom: 5px;
-    }
-    
-    .image-description {
-        color: rgba(255, 255, 255, 0.9);
-        font-size: 0.9em;
-    }
-    
-    .load-more-container {
-        text-align: center;
-        margin: 30px 0;
-        padding-top: 20px; /* 增加顶部空间，防止按钮被图片覆盖 */
-        position: relative; /* 确保不被覆盖 */
-        z-index: 10; /* 提高层级 */
-        clear: both;
-    }
-    
-    .load-more-btn {
-        padding: 10px 20px;
-        background-color: #3498db;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        font-size: 16px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-    
-    .load-more-btn:hover {
-        background-color: #2980b9;
-    }
-    
-    .loading-placeholder {
-        width: 100%;
-        margin: 20px 0;
-    }
-    
-    .flex-grid {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 15px;
-        justify-content: center;
-    }
-    
-    .card.loading {
-        width: 300px;
-        height: 200px;
-        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-        background-size: 200% 100%;
-        animation: loading-animation 1.5s infinite;
-        border-radius: 8px;
-    }
-    
-    @keyframes loading-animation {
-        0% {
-            background-position: 200% 0;
+    // 方法3: 立即执行检查
+    (function() {
+        // 如果DOM已经准备好，立即初始化
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            console.log("DOM已经准备好，立即初始化");
+            setTimeout(initializeMasonry, 0);
         }
-        100% {
-            background-position: -200% 0;
-        }
-    }
-    
-    @media (max-width: 576px) {
-        .card.loading {
-            width: 100%;
-            height: 150px;
-        }
-        
-        #masonry-grid {
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            grid-gap: 10px;
-        }
-    }
-</style>
+    })();
+</script>
