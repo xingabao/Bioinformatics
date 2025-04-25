@@ -66,12 +66,8 @@ const initialLoadCount = 7;
             const item = document.createElement('div');
             item.className = 'masonry-item';
             
-            // 添加占位符和默认宽高比数据
-            const aspectRatio = imageData.aspectRatio || 1.5; // 默认宽高比，如果没有提供
-            
             item.innerHTML = `
-                <div class="image-container" style="padding-bottom: ${(1/aspectRatio) * 100}%;">
-                    <div class="image-placeholder"></div>
+                <div class="image-container">
                     <img data-src="${imageData.image}" alt="${imageData.title || ''}" class="lazy-image">
                     <div class="image-overlay">
                         <div class="image-title">${imageData.title || ''}</div>
@@ -80,23 +76,22 @@ const initialLoadCount = 7;
                 </div>
             `;
             
-            // 预加载图片以获取准确尺寸
-            const tempImg = new Image();
-            tempImg.onload = function() {
-                const actualRatio = tempImg.width / tempImg.height;
-                item.querySelector('.image-container').style.paddingBottom = `${(1/actualRatio) * 100}%`;
-                setRowSpan(item);
-            };
-            tempImg.src = imageData.image;
-            
             return item;
         }
         
         // 设置行跨度
         function setRowSpan(item) {
-            const container = item.querySelector('.image-container');
-            const rowHeight = 40; // 与CSS中的grid-auto-rows保持一致
-            const contentHeight = container.offsetHeight;
+            const img = item.querySelector('img');
+            // 如果图片还没有加载完成，先设置一个临时的行跨度
+            if (!img.complete || img.naturalHeight === 0) {
+				// 临时设置一个默认值
+                item.style.gridRow = 'span 1';
+                return;
+            }
+			
+            // 匹配 grid-auto-rows: 40px
+            const rowHeight = 60;
+            const contentHeight = item.querySelector('.image-container').offsetHeight;
             const rowSpan = Math.ceil(contentHeight / rowHeight);
             item.style.gridRow = `span ${rowSpan}`;
         }
@@ -110,26 +105,15 @@ const initialLoadCount = 7;
                     entries.forEach(entry => {
                         if (entry.isIntersecting) {
                             const img = entry.target;
+                            img.src = img.dataset.src;
+                            img.classList.remove('lazy-image');
                             
-                            // 设置图片加载状态类
-                            img.classList.add('loading');
-                            
+                            // 图片加载后更新行跨度
                             img.onload = function() {
-                                img.classList.remove('lazy-image', 'loading');
-                                // 图片加载后微调布局
                                 const item = img.closest('.masonry-item');
-                                requestAnimationFrame(() => {
-                                    setRowSpan(item);
-                                });
-                                
-                                // 隐藏占位符
-                                const placeholder = img.previousElementSibling;
-                                if (placeholder && placeholder.classList.contains('image-placeholder')) {
-                                    placeholder.style.display = 'none';
-                                }
+                                setRowSpan(item);
                             };
                             
-                            img.src = img.dataset.src;
                             imageObserver.unobserve(img);
                         }
                     });
@@ -143,19 +127,12 @@ const initialLoadCount = 7;
             } else {
                 // 浏览器不支持 IntersectionObserver 的回退
                 lazyImages.forEach(img => {
-                    img.classList.add('loading');
+                    img.src = img.dataset.src;
                     img.onload = function() {
-                        img.classList.remove('lazy-image', 'loading');
+                        img.classList.remove('lazy-image');
                         const item = img.closest('.masonry-item');
                         setRowSpan(item);
-                        
-                        // 隐藏占位符
-                        const placeholder = img.previousElementSibling;
-                        if (placeholder && placeholder.classList.contains('image-placeholder')) {
-                            placeholder.style.display = 'none';
-                        }
                     };
-                    img.src = img.dataset.src;
                 });
             }
         }
@@ -249,44 +226,22 @@ const initialLoadCount = 7;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         transition: transform 0.3s ease;
         background-color: #f5f5f5;
-        /* 添加这些属性来维持宽高比 */
-        width: 100%;
-        height: 0; /* 高度将通过padding-bottom来控制 */
     }
     
     .image-container:hover {
         transform: translateY(-5px);
     }
     
-    .image-placeholder {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-        background-size: 200% 100%;
-        animation: loading-animation 1.5s infinite;
-        z-index: 1;
-    }
-    
     .image-container img {
-        position: absolute;
-        top: 0;
-        left: 0;
         width: 100%;
-        height: 100%;
-        object-fit: cover; /* 保持图片比例并填充容器 */
-        z-index: 2;
+        height: auto;
+        display: block;
+        vertical-align: middle;
     }
     
     .lazy-image {
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-    
-    img:not(.lazy-image) {
-        opacity: 1;
+        min-height: 200px;
+        background-color: #f0f0f0;
     }
     
     .image-overlay {
@@ -297,7 +252,6 @@ const initialLoadCount = 7;
         background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
         padding: 20px 10px 10px;
         box-sizing: border-box;
-        z-index: 3;
     }
     
     .image-title {
@@ -348,8 +302,8 @@ const initialLoadCount = 7;
     }
     
     .card.loading {
-        width: 30px;
-        height: 20px;
+        width: 300px;
+        height: 200px;
         background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
         background-size: 200% 100%;
         animation: loading-animation 1.5s infinite;
@@ -368,12 +322,7 @@ const initialLoadCount = 7;
     @media (max-width: 576px) {
         .card.loading {
             width: 100%;
-            height: 50px;
-        }
-        
-        #masonry-grid {
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            grid-gap: 10px;
+            height: 150px;
         }
     }
 </style>
