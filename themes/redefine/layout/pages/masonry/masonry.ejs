@@ -31,7 +31,17 @@ const images = theme.masonry;
 
 <script>
     (function() {
+        // 检查当前页面是否为瀑布流页面
+        function isMasonryPage() {
+            return document.getElementById('masonry-grid') !== null;
+        }
+        
         function initMasonry() {
+            // 如果不是瀑布流页面，直接返回
+            if (!isMasonryPage()) {
+                return;
+            }
+            
             // 清理已存在的查看器
             document.querySelectorAll('div.image-viewer-container').forEach(el => el.remove());
             
@@ -104,21 +114,27 @@ const images = theme.masonry;
             // 图片查看器
             const imageViewer = {
                 setup() {
-                    if (!document.getElementById('image-viewer')) {
-                        const viewer = document.createElement('div');
-                        viewer.id = 'image-viewer';
-                        viewer.innerHTML = `
-                            <div class="viewer-backdrop"></div>
-                            <div class="viewer-container">
-                                <img id="viewer-image" src="" alt="">
-                                <button class="viewer-close">&times;</button>
-                            </div>
-                        `;
-                        document.body.appendChild(viewer);
-                        
-                        viewer.querySelector('.viewer-backdrop').addEventListener('click', this.close);
-                        viewer.querySelector('.viewer-close').addEventListener('click', this.close);
+                    // 移除可能存在的旧查看器
+                    const existingViewer = document.getElementById('image-viewer');
+                    if (existingViewer) {
+                        existingViewer.remove();
                     }
+                    
+                    // 创建新查看器
+                    const viewer = document.createElement('div');
+                    viewer.id = 'image-viewer';
+                    viewer.className = 'image-viewer-container'; // 添加类名便于清理
+                    viewer.innerHTML = `
+                        <div class="viewer-backdrop"></div>
+                        <div class="viewer-container">
+                            <img id="viewer-image" src="" alt="">
+                            <button class="viewer-close">&times;</button>
+                        </div>
+                    `;
+                    document.body.appendChild(viewer);
+                    
+                    viewer.querySelector('.viewer-backdrop').addEventListener('click', this.close);
+                    viewer.querySelector('.viewer-close').addEventListener('click', this.close);
                     
                     masonryGrid.addEventListener('click', (e) => {
                         const container = e.target.closest('.image-container');
@@ -131,14 +147,27 @@ const images = theme.masonry;
                 
                 open(imageUrl) {
                     const viewer = document.getElementById('image-viewer');
-                    document.getElementById('viewer-image').src = imageUrl;
-                    viewer.classList.add('active');
-                    document.body.style.overflow = 'hidden';
+                    if (viewer) {
+                        document.getElementById('viewer-image').src = imageUrl;
+                        viewer.classList.add('active');
+                        document.body.style.overflow = 'hidden';
+                    }
                 },
                 
                 close() {
-                    document.getElementById('image-viewer').classList.remove('active');
-                    document.body.style.overflow = '';
+                    const viewer = document.getElementById('image-viewer');
+                    if (viewer) {
+                        viewer.classList.remove('active');
+                        document.body.style.overflow = '';
+                    }
+                },
+                
+                // 添加一个清理方法
+                cleanup() {
+                    const viewer = document.getElementById('image-viewer');
+                    if (viewer) {
+                        viewer.remove();
+                    }
                 }
             };
             
@@ -263,14 +292,28 @@ const images = theme.masonry;
             window.addEventListener('resize', utils.debounce(() => {
                 document.querySelectorAll('.masonry-item').forEach(utils.setRowSpan);
             }, 100));
+            
+            // 添加到全局对象，便于清理
+            window.masonryImageViewer = imageViewer;
         }
-
+        
+        // 添加页面卸载事件处理
+        function cleanupMasonry() {
+            if (window.masonryImageViewer) {
+                window.masonryImageViewer.cleanup();
+                delete window.masonryImageViewer;
+            }
+        }
+        
         // DOM加载检查
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initMasonry);
         } else {
             initMasonry();
         }
+        
+        // 添加页面卸载事件
+        window.addEventListener('beforeunload', cleanupMasonry);
     })();
 </script>
 
