@@ -11,12 +11,7 @@ hexo.extend.filter.register(
         // Exit if the src doesn't exists.
         if (!src) return match;
 
-        return `<img ${attrBegin}
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="${src}"
-                     ${attrEnd}
-                >`
+        return ''
       }
     )
   },
