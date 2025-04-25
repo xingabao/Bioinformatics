@@ -8,7 +8,7 @@ const images = theme.masonry;
 %>
 
 <h4>第一次打开好像不能自动显示，要刷新一下此页面才行，暂时还没找到具体原因，后面再修复吧。</h4>
-<h4>图片比较多，每次随机出现 5 个图片，目前一共 <%- images.length %> 个图片</h4>
+<h4>每次随机显示 5 个，目前一共 <%- images.length %></h4>
 <br>
 
 <div id="loading-placeholder" class="loading-placeholder">
@@ -41,7 +41,7 @@ const images = theme.masonry;
             const noImagesMessage = document.getElementById('no-images-message');
             
             // 配置项
-            const batchSize = 5;
+            const batchSize = 10;
             let currentIndex = 0;
             
             // 获取图片数据
@@ -100,63 +100,46 @@ const images = theme.masonry;
                 }
             };
             
-			// 图片查看器
-			const imageViewer = {
-				setup() {
-					// 创建唯一的图片查看器ID，确保只在当前页面中有效
-					const viewerId = 'image-viewer-' + Math.random().toString(36).substr(2, 9);
-					
-					// 查找当前页面容器，而不是使用body
-					const pageContainer = document.querySelector('.masonry-grid-container').parentElement;
-					
-					if (!pageContainer.querySelector('.image-viewer-container')) {
-						const viewerContainer = document.createElement('div');
-						viewerContainer.className = 'image-viewer-container';
-						
-						const viewer = document.createElement('div');
-						viewer.id = viewerId;
-						viewer.className = 'image-viewer';
-						viewer.innerHTML = `
-							<div class="viewer-backdrop"></div>
-							<div class="viewer-content">
-								<div class="viewer-container">
-									<img id="viewer-image-${viewerId}" src="" alt="">
-									<button class="viewer-close">&times;</button>
-								</div>
-							</div>
-						`;
-						
-						viewerContainer.appendChild(viewer);
-						pageContainer.appendChild(viewerContainer);
-						
-						viewer.querySelector('.viewer-backdrop').addEventListener('click', () => this.close(viewerId));
-						viewer.querySelector('.viewer-close').addEventListener('click', () => this.close(viewerId));
-					}
-					
-					// 存储查看器ID作为对象属性，以便后续使用
-					this.currentViewerId = viewerId;
-					
-					masonryGrid.addEventListener('click', (e) => {
-						const container = e.target.closest('.image-container');
-						if (container) {
-							const fullImageUrl = container.getAttribute('data-full-image');
-							if (fullImageUrl) this.open(fullImageUrl, viewerId);
-						}
-					});
-				},
-				
-				open(imageUrl, viewerId) {
-					const viewer = document.getElementById(viewerId);
-					document.getElementById(`viewer-image-${viewerId}`).src = imageUrl;
-					viewer.classList.add('active');
-					document.body.style.overflow = 'hidden';
-				},
-				
-				close(viewerId) {
-					document.getElementById(viewerId).classList.remove('active');
-					document.body.style.overflow = '';
-				}
-			};
+            // 图片查看器
+            const imageViewer = {
+                setup() {
+                    if (!document.getElementById('image-viewer')) {
+                        const viewer = document.createElement('div');
+                        viewer.id = 'image-viewer';
+                        viewer.innerHTML = `
+                            <div class="viewer-backdrop"></div>
+                            <div class="viewer-container">
+                                <img id="viewer-image" src="" alt="">
+                                <button class="viewer-close">&times;</button>
+                            </div>
+                        `;
+                        document.body.appendChild(viewer);
+                        
+                        viewer.querySelector('.viewer-backdrop').addEventListener('click', this.close);
+                        viewer.querySelector('.viewer-close').addEventListener('click', this.close);
+                    }
+                    
+                    masonryGrid.addEventListener('click', (e) => {
+                        const container = e.target.closest('.image-container');
+                        if (container) {
+                            const fullImageUrl = container.getAttribute('data-full-image');
+                            if (fullImageUrl) this.open(fullImageUrl);
+                        }
+                    });
+                },
+                
+                open(imageUrl) {
+                    const viewer = document.getElementById('image-viewer');
+                    document.getElementById('viewer-image').src = imageUrl;
+                    viewer.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                },
+                
+                close() {
+                    document.getElementById('image-viewer').classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            };
             
             // 图片加载
             const imageLoader = {
@@ -432,17 +415,7 @@ const images = theme.masonry;
     }
     
     /* 图片查看器样式 */
-    .image-viewer-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 9999;
-        pointer-events: none;
-    }
-    
-    .image-viewer {
+    #image-viewer {
         position: fixed;
         top: 0;
         left: 0;
@@ -452,9 +425,8 @@ const images = theme.masonry;
         display: none;
     }
     
-    .image-viewer.active {
+    #image-viewer.active {
         display: block;
-        pointer-events: auto;
     }
     
     .viewer-backdrop {
@@ -466,32 +438,21 @@ const images = theme.masonry;
         background-color: rgba(0,0,0,0.9);
     }
     
-    .viewer-content {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 40%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
     .viewer-container {
-        position: relative;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
         max-width: 90%;
         max-height: 90%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
     }
     
-    .viewer-container img {
+    #viewer-image {
         max-width: 100%;
-        max-height: 60vh;
+        max-height: 90vh;
         box-shadow: 0 5px 25px rgba(0,0,0,0.5);
         display: block;
-        object-fit: contain;
+        margin: 0 auto;
     }
     
     .viewer-close {
@@ -532,7 +493,7 @@ const images = theme.masonry;
             grid-gap: 10px;
         }
         
-        .viewer-container img {
+        #viewer-image {
             max-height: 80vh;
         }
     }
