@@ -2,8 +2,8 @@
     <%- getPageTitle(page) %>
 </h1>
 
-<h4>第一次打开好像不能自动显示，要刷新一下此页面才行，暂时还没找到具体原因，后面再修复吧。</h4>
-<hr>
+<h4>瀑布流图片展示</h4>
+<br>
 
 <div class="loading-placeholder">
     <div style="display: none; flex-wrap: wrap; gap: 5px; width: 100%;" class="flex-grid generic-card">
@@ -23,307 +23,319 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // 获取所有图片数据，添加安全检查
-        let allImages = [];
-        try {
-            // 尝试获取主题配置中的图片数据
-            <% if (typeof theme !== 'undefined' && theme.masonry) { %>
-                allImages = <%- JSON.stringify(theme.masonry) %>;
-            <% } else { %>
-                allImages = [];
-            <% } %>
-        } catch (e) {
-            console.error('Error getting image data:', e);
-            allImages = []; // 出错时使用空数组
-        }
-        
-        // 如果图片数组为空，显示提示信息
-        if (!allImages || allImages.length === 0) {
-            const msgElem = document.createElement('div');
-            msgElem.className = 'no-images-message';
-            msgElem.textContent = '暂无图片数据。请在主题配置中添加瀑布流图片数据。';
-            document.querySelector('.masonry-grid-container').appendChild(msgElem);
-            document.getElementById('load-more-btn').style.display = 'none';
-            document.querySelector('.loading-placeholder').style.display = 'none';
-            return; // 如果没有数据，就不继续执行
-        }
-        
-        // 打乱图片数组顺序
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-        
-        // 初始化时随机排序图片
-        allImages = shuffleArray(allImages);
-        
-        // 当前已加载的图片索引
-        let currentIndex = 0;
-        
-        // 每次加载的图片数量
-        const batchSize = 10; // 使用固定值替代 initialLoadCount
-        
-        // 获取容器
-        const masonryGrid = document.getElementById('masonry-grid');
-        const loadMoreBtn = document.getElementById('load-more-btn');
-        const loadingPlaceholder = document.querySelector('.loading-placeholder');
-        
-        // 控制加载按钮状态
-        function setLoadingState(isLoading) {
-            if (isLoading) {
-                loadMoreBtn.textContent = '加载中...';
-                loadMoreBtn.disabled = true;
-                loadMoreBtn.classList.add('loading');
-            } else {
-                loadMoreBtn.textContent = '加载更多';
-                loadMoreBtn.disabled = false;
-                loadMoreBtn.classList.remove('loading');
-            }
-        }
-        
-        // 隐藏加载占位符
-        function hideLoadingPlaceholder() {
-            if (loadingPlaceholder) {
-                loadingPlaceholder.style.display = 'none';
-            }
-            masonryGrid.style.display = 'grid';
-        }
-        
-        // 创建图片元素
-        function createImageElement(imageData) {
-            const item = document.createElement('div');
-            item.className = 'masonry-item';
-            
-            // 添加占位符和默认宽高比数据
-            const aspectRatio = imageData.aspectRatio || 1.5; // 默认宽高比，如果没有提供
-            
-            item.innerHTML = `
-                <div class="image-container" data-full-image="${imageData.image}">
-                    <div class="image-placeholder"></div>
-                    <img data-src="${imageData.image}" alt="${imageData.title || ''}" class="lazy-image">
-                    <div class="image-overlay">
-                        <div class="image-title">${imageData.title || ''}</div>
-                        <div class="image-description">${imageData.description || ''}</div>
-                    </div>
-                </div>
-            `;
-            
-            // 预加载图片以获取准确尺寸
-            const tempImg = new Image();
-            tempImg.onload = function() {
-                const actualRatio = tempImg.width / tempImg.height;
-                item.querySelector('.image-container').style.paddingBottom = `${(1/actualRatio) * 100}%`;
-                setRowSpan(item);
-            };
-            tempImg.src = imageData.image;
-            
-            return item;
-        }
-        
-        // 设置行跨度
-        function setRowSpan(item) {
-            const container = item.querySelector('.image-container');
-            const rowHeight = 55; // 与CSS中的grid-auto-rows保持一致
-            const contentHeight = container.offsetHeight;
-            const rowSpan = Math.ceil(contentHeight / rowHeight);
-            item.style.gridRow = `span ${rowSpan}`;
-        }
-        
-        // 懒加载图片
-        function setupLazyLoading() {
-            const lazyImages = document.querySelectorAll('.lazy-image');
-            let loadedCount = 0;
-            const totalToLoad = lazyImages.length;
-            
-            // 设置加载状态
-            if (totalToLoad > 0) {
-                setLoadingState(true);
+    // 立即执行函数，解决首次加载问题
+    (function() {
+        // 检查DOM是否已加载完成
+        function initMasonry() {
+            // 获取所有图片数据，添加安全检查
+            let allImages = [];
+            try {
+                // 尝试获取主题配置中的图片数据
+                <% if (typeof theme !== 'undefined' && theme.masonry) { %>
+                    allImages = <%- JSON.stringify(theme.masonry) %>;
+                <% } else { %>
+                    allImages = [];
+                <% } %>
+            } catch (e) {
+                console.error('Error getting image data:', e);
+                allImages = []; // 出错时使用空数组
             }
             
-            function checkAllLoaded() {
-                loadedCount++;
-                if (loadedCount >= totalToLoad) {
-                    setLoadingState(false);
+            // 如果图片数组为空，显示提示信息
+            if (!allImages || allImages.length === 0) {
+                const msgElem = document.createElement('div');
+                msgElem.className = 'no-images-message';
+                msgElem.textContent = '暂无图片数据。请在主题配置中添加瀑布流图片数据。';
+                document.querySelector('.masonry-grid-container').appendChild(msgElem);
+                document.getElementById('load-more-btn').style.display = 'none';
+                document.querySelector('.loading-placeholder').style.display = 'none';
+                return; // 如果没有数据，就不继续执行
+            }
+            
+            // 打乱图片数组顺序
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+            
+            // 初始化时随机排序图片
+            allImages = shuffleArray(allImages);
+            
+            // 当前已加载的图片索引
+            let currentIndex = 0;
+            
+            // 每次加载的图片数量
+            const batchSize = 10; // 使用固定值替代 initialLoadCount
+            
+            // 获取容器
+            const masonryGrid = document.getElementById('masonry-grid');
+            const loadMoreBtn = document.getElementById('load-more-btn');
+            const loadingPlaceholder = document.querySelector('.loading-placeholder');
+            
+            // 控制加载按钮状态
+            function setLoadingState(isLoading) {
+                if (isLoading) {
+                    loadMoreBtn.textContent = '加载中...';
+                    loadMoreBtn.disabled = true;
+                    loadMoreBtn.classList.add('loading');
+                } else {
+                    loadMoreBtn.textContent = '加载更多';
+                    loadMoreBtn.disabled = false;
+                    loadMoreBtn.classList.remove('loading');
                 }
             }
             
-            if ('IntersectionObserver' in window) {
-                const imageObserver = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            const img = entry.target;
-                            
-                            // 设置图片加载状态类
-                            img.classList.add('loading');
-                            
-                            img.onload = function() {
-                                img.classList.remove('lazy-image', 'loading');
-                                // 图片加载后微调布局
-                                const item = img.closest('.masonry-item');
-                                requestAnimationFrame(() => {
-                                    setRowSpan(item);
-                                });
-                                
-                                // 隐藏占位符
-                                const placeholder = img.previousElementSibling;
-                                if (placeholder && placeholder.classList.contains('image-placeholder')) {
-                                    placeholder.style.display = 'none';
-                                }
-                                
-                                checkAllLoaded();
-                            };
-                            
-                            img.onerror = function() {
-                                checkAllLoaded();
-                            };
-                            
-                            img.src = img.dataset.src;
-                            imageObserver.unobserve(img);
-                        }
-                    });
-                }, {
-                    rootMargin: '200px 0px'
-                });
-                
-                lazyImages.forEach(img => {
-                    imageObserver.observe(img);
-                });
-            } else {
-                // 浏览器不支持 IntersectionObserver 的回退
-                lazyImages.forEach(img => {
-                    img.classList.add('loading');
-                    img.onload = function() {
-                        img.classList.remove('lazy-image', 'loading');
-                        const item = img.closest('.masonry-item');
-                        setRowSpan(item);
-                        
-                        // 隐藏占位符
-                        const placeholder = img.previousElementSibling;
-                        if (placeholder && placeholder.classList.contains('image-placeholder')) {
-                            placeholder.style.display = 'none';
-                        }
-                        
-                        checkAllLoaded();
-                    };
-                    
-                    img.onerror = function() {
-                        checkAllLoaded();
-                    };
-                    
-                    img.src = img.dataset.src;
-                });
+            // 隐藏加载占位符
+            function hideLoadingPlaceholder() {
+                if (loadingPlaceholder) {
+                    loadingPlaceholder.style.display = 'none';
+                }
+                masonryGrid.style.display = 'grid';
             }
-        }
-        
-        // 添加查看大图功能
-        function setupImageViewer() {
-            // 如果页面中还没有图片查看器，创建一个
-            if (!document.getElementById('image-viewer')) {
-                const viewer = document.createElement('div');
-                viewer.id = 'image-viewer';
-                viewer.innerHTML = `
-                    <div class="viewer-backdrop"></div>
-                    <div class="viewer-container">
-                        <img id="viewer-image" src="" alt="">
-                        <button class="viewer-close">&times;</button>
+            
+            // 创建图片元素
+            function createImageElement(imageData) {
+                const item = document.createElement('div');
+                item.className = 'masonry-item';
+                
+                // 添加占位符和默认宽高比数据
+                const aspectRatio = imageData.aspectRatio || 1.5; // 默认宽高比，如果没有提供
+                
+                item.innerHTML = `
+                    <div class="image-container" data-full-image="${imageData.image}">
+                        <div class="image-placeholder"></div>
+                        <img data-src="${imageData.image}" alt="${imageData.title || ''}" class="lazy-image">
+                        <div class="image-overlay">
+                            <div class="image-title">${imageData.title || ''}</div>
+                            <div class="image-description">${imageData.description || ''}</div>
+                        </div>
                     </div>
                 `;
-                document.body.appendChild(viewer);
                 
-                // 点击背景或关闭按钮关闭查看器
-                viewer.querySelector('.viewer-backdrop').addEventListener('click', closeViewer);
-                viewer.querySelector('.viewer-close').addEventListener('click', closeViewer);
+                // 预加载图片以获取准确尺寸
+                const tempImg = new Image();
+                tempImg.onload = function() {
+                    const actualRatio = tempImg.width / tempImg.height;
+                    item.querySelector('.image-container').style.paddingBottom = `${(1/actualRatio) * 100}%`;
+                    setRowSpan(item);
+                };
+                tempImg.src = imageData.image;
+                
+                return item;
             }
             
-            // 为所有图片容器添加点击事件，包括已存在的和未来加载的
-            masonryGrid.addEventListener('click', (e) => {
-                const container = e.target.closest('.image-container');
-                if (container) {
-                    const fullImageUrl = container.getAttribute('data-full-image');
-                    if (fullImageUrl) {
-                        openViewer(fullImageUrl);
+            // 设置行跨度
+            function setRowSpan(item) {
+                const container = item.querySelector('.image-container');
+                const rowHeight = 55; // 与CSS中的grid-auto-rows保持一致
+                const contentHeight = container.offsetHeight;
+                const rowSpan = Math.ceil(contentHeight / rowHeight);
+                item.style.gridRow = `span ${rowSpan}`;
+            }
+            
+            // 懒加载图片
+            function setupLazyLoading() {
+                const lazyImages = document.querySelectorAll('.lazy-image');
+                let loadedCount = 0;
+                const totalToLoad = lazyImages.length;
+                
+                // 设置加载状态
+                if (totalToLoad > 0) {
+                    setLoadingState(true);
+                }
+                
+                function checkAllLoaded() {
+                    loadedCount++;
+                    if (loadedCount >= totalToLoad) {
+                        setLoadingState(false);
                     }
                 }
-            });
-        }
-        
-        // 打开图片查看器
-        function openViewer(imageUrl) {
-            const viewer = document.getElementById('image-viewer');
-            const viewerImage = document.getElementById('viewer-image');
-            
-            // 设置图片源并显示查看器
-            viewerImage.src = imageUrl;
-            viewer.classList.add('active');
-            document.body.style.overflow = 'hidden'; // 防止背景滚动
-        }
-        
-        // 关闭图片查看器
-        function closeViewer() {
-            const viewer = document.getElementById('image-viewer');
-            viewer.classList.remove('active');
-            document.body.style.overflow = ''; // 恢复滚动
-        }
-        
-        // 加载更多图片
-        function loadMoreImages() {
-            // 每次加载前，对剩余的图片重新洗牌
-            if (currentIndex < allImages.length) {
-                const remainingImages = allImages.slice(currentIndex);
-                const shuffledRemaining = shuffleArray(remainingImages);
-                allImages = [...allImages.slice(0, currentIndex), ...shuffledRemaining];
-            }
-            
-            const endIndex = Math.min(currentIndex + batchSize, allImages.length);
-            
-            for (let i = currentIndex; i < endIndex; i++) {
-                if (allImages[i]) {
-                    const imageElement = createImageElement(allImages[i]);
-                    masonryGrid.appendChild(imageElement);
+                
+                if ('IntersectionObserver' in window) {
+                    const imageObserver = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                const img = entry.target;
+                                
+                                // 设置图片加载状态类
+                                img.classList.add('loading');
+                                
+                                img.onload = function() {
+                                    img.classList.remove('lazy-image', 'loading');
+                                    // 图片加载后微调布局
+                                    const item = img.closest('.masonry-item');
+                                    requestAnimationFrame(() => {
+                                        setRowSpan(item);
+                                    });
+                                    
+                                    // 隐藏占位符
+                                    const placeholder = img.previousElementSibling;
+                                    if (placeholder && placeholder.classList.contains('image-placeholder')) {
+                                        placeholder.style.display = 'none';
+                                    }
+                                    
+                                    checkAllLoaded();
+                                };
+                                
+                                img.onerror = function() {
+                                    checkAllLoaded();
+                                };
+                                
+                                img.src = img.dataset.src;
+                                imageObserver.unobserve(img);
+                            }
+                        });
+                    }, {
+                        rootMargin: '200px 0px'
+                    });
+                    
+                    lazyImages.forEach(img => {
+                        imageObserver.observe(img);
+                    });
+                } else {
+                    // 浏览器不支持 IntersectionObserver 的回退
+                    lazyImages.forEach(img => {
+                        img.classList.add('loading');
+                        img.onload = function() {
+                            img.classList.remove('lazy-image', 'loading');
+                            const item = img.closest('.masonry-item');
+                            setRowSpan(item);
+                            
+                            // 隐藏占位符
+                            const placeholder = img.previousElementSibling;
+                            if (placeholder && placeholder.classList.contains('image-placeholder')) {
+                                placeholder.style.display = 'none';
+                            }
+                            
+                            checkAllLoaded();
+                        };
+                        
+                        img.onerror = function() {
+                            checkAllLoaded();
+                        };
+                        
+                        img.src = img.dataset.src;
+                    });
                 }
             }
             
-            // 更新当前索引
-            currentIndex = endIndex;
-            
-            // 启用懒加载
-            setupLazyLoading();
-            
-            // 如果所有图片都已加载，隐藏"加载更多"按钮
-            if (currentIndex >= allImages.length) {
-                loadMoreBtn.style.display = 'none';
-            }
-        }
-        
-        // 窗口大小调整处理
-        let resizeTimeout;
-        window.addEventListener('resize', function() {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => {
-                // 重新计算所有已加载图片的行跨度
-                document.querySelectorAll('.masonry-item').forEach(item => {
-                    setRowSpan(item);
+            // 添加查看大图功能
+            function setupImageViewer() {
+                // 如果页面中还没有图片查看器，创建一个
+                if (!document.getElementById('image-viewer')) {
+                    const viewer = document.createElement('div');
+                    viewer.id = 'image-viewer';
+                    viewer.innerHTML = `
+                        <div class="viewer-backdrop"></div>
+                        <div class="viewer-container">
+                            <img id="viewer-image" src="" alt="">
+                            <button class="viewer-close">&times;</button>
+                        </div>
+                    `;
+                    document.body.appendChild(viewer);
+                    
+                    // 点击背景或关闭按钮关闭查看器
+                    viewer.querySelector('.viewer-backdrop').addEventListener('click', closeViewer);
+                    viewer.querySelector('.viewer-close').addEventListener('click', closeViewer);
+                }
+                
+                // 为所有图片容器添加点击事件，包括已存在的和未来加载的
+                masonryGrid.addEventListener('click', (e) => {
+                    const container = e.target.closest('.image-container');
+                    if (container) {
+                        const fullImageUrl = container.getAttribute('data-full-image');
+                        if (fullImageUrl) {
+                            openViewer(fullImageUrl);
+                        }
+                    }
                 });
-            }, 100);
-        });
-        
-        // 加载更多按钮点击事件
-        loadMoreBtn.addEventListener('click', loadMoreImages);
-        
-        // 初始化
-        function init() {
-            hideLoadingPlaceholder();
-            loadMoreImages();
-            setupImageViewer();
+            }
+            
+            // 打开图片查看器
+            function openViewer(imageUrl) {
+                const viewer = document.getElementById('image-viewer');
+                const viewerImage = document.getElementById('viewer-image');
+                
+                // 设置图片源并显示查看器
+                viewerImage.src = imageUrl;
+                viewer.classList.add('active');
+                document.body.style.overflow = 'hidden'; // 防止背景滚动
+            }
+            
+            // 关闭图片查看器
+            function closeViewer() {
+                const viewer = document.getElementById('image-viewer');
+                viewer.classList.remove('active');
+                document.body.style.overflow = ''; // 恢复滚动
+            }
+            
+            // 加载更多图片
+            function loadMoreImages() {
+                // 每次加载前，对剩余的图片重新洗牌
+                if (currentIndex < allImages.length) {
+                    const remainingImages = allImages.slice(currentIndex);
+                    const shuffledRemaining = shuffleArray(remainingImages);
+                    allImages = [...allImages.slice(0, currentIndex), ...shuffledRemaining];
+                }
+                
+                const endIndex = Math.min(currentIndex + batchSize, allImages.length);
+                
+                for (let i = currentIndex; i < endIndex; i++) {
+                    if (allImages[i]) {
+                        const imageElement = createImageElement(allImages[i]);
+                        masonryGrid.appendChild(imageElement);
+                    }
+                }
+                
+                // 更新当前索引
+                currentIndex = endIndex;
+                
+                // 启用懒加载
+                setupLazyLoading();
+                
+                // 如果所有图片都已加载，隐藏"加载更多"按钮
+                if (currentIndex >= allImages.length) {
+                    loadMoreBtn.style.display = 'none';
+                }
+            }
+            
+            // 窗口大小调整处理
+            let resizeTimeout;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    // 重新计算所有已加载图片的行跨度
+                    document.querySelectorAll('.masonry-item').forEach(item => {
+                        setRowSpan(item);
+                    });
+                }, 100);
+            });
+            
+            // 加载更多按钮点击事件
+            loadMoreBtn.addEventListener('click', loadMoreImages);
+            
+            // 初始化
+            function init() {
+                hideLoadingPlaceholder();
+                loadMoreImages();
+                setupImageViewer();
+            }
+            
+            // 开始初始化
+            init();
         }
-        
-        // 开始初始化
-        init();
-    });
+
+        // 检查DOM是否已加载
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initMasonry);
+        } else {
+            // DOM已经加载完成，直接执行
+            initMasonry();
+        }
+    })();
 </script>
 
 <style>
