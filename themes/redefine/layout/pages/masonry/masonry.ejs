@@ -94,46 +94,61 @@
                 }
             };
             
-            // 图片查看器
-            const imageViewer = {
-                setup() {
-                    if (!document.getElementById('image-viewer')) {
-                        const viewer = document.createElement('div');
-                        viewer.id = 'image-viewer';
-                        viewer.innerHTML = `
-                            <div class="viewer-backdrop"></div>
-                            <div class="viewer-container">
-                                <img id="viewer-image" src="" alt="">
-                                <button class="viewer-close">&times;</button>
-                            </div>
-                        `;
-                        document.body.appendChild(viewer);
-                        
-                        viewer.querySelector('.viewer-backdrop').addEventListener('click', this.close);
-                        viewer.querySelector('.viewer-close').addEventListener('click', this.close);
-                    }
-                    
-                    masonryGrid.addEventListener('click', (e) => {
-                        const container = e.target.closest('.image-container');
-                        if (container) {
-                            const fullImageUrl = container.getAttribute('data-full-image');
-                            if (fullImageUrl) this.open(fullImageUrl);
-                        }
-                    });
-                },
-                
-                open(imageUrl) {
-                    const viewer = document.getElementById('image-viewer');
-                    document.getElementById('viewer-image').src = imageUrl;
-                    viewer.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                },
-                
-                close() {
-                    document.getElementById('image-viewer').classList.remove('active');
-                    document.body.style.overflow = '';
-                }
-            };
+			// 图片查看器
+			const imageViewer = {
+				setup() {
+					// 创建唯一的图片查看器ID，确保只在当前页面中有效
+					const viewerId = 'image-viewer-' + Math.random().toString(36).substr(2, 9);
+					
+					// 查找当前页面容器，而不是使用body
+					const pageContainer = document.querySelector('.masonry-grid-container').parentElement;
+					
+					if (!pageContainer.querySelector('.image-viewer-container')) {
+						const viewerContainer = document.createElement('div');
+						viewerContainer.className = 'image-viewer-container';
+						
+						const viewer = document.createElement('div');
+						viewer.id = viewerId;
+						viewer.className = 'image-viewer';
+						viewer.innerHTML = `
+							<div class="viewer-backdrop"></div>
+							<div class="viewer-container">
+								<img id="viewer-image-${viewerId}" src="" alt="">
+								<button class="viewer-close">&times;</button>
+							</div>
+						`;
+						
+						viewerContainer.appendChild(viewer);
+						pageContainer.appendChild(viewerContainer);
+						
+						viewer.querySelector('.viewer-backdrop').addEventListener('click', () => this.close(viewerId));
+						viewer.querySelector('.viewer-close').addEventListener('click', () => this.close(viewerId));
+					}
+					
+					// 存储查看器ID作为对象属性，以便后续使用
+					this.currentViewerId = viewerId;
+					
+					masonryGrid.addEventListener('click', (e) => {
+						const container = e.target.closest('.image-container');
+						if (container) {
+							const fullImageUrl = container.getAttribute('data-full-image');
+							if (fullImageUrl) this.open(fullImageUrl, viewerId);
+						}
+					});
+				},
+				
+				open(imageUrl, viewerId) {
+					const viewer = document.getElementById(viewerId);
+					document.getElementById(`viewer-image-${viewerId}`).src = imageUrl;
+					viewer.classList.add('active');
+					document.body.style.overflow = 'hidden';
+				},
+				
+				close(viewerId) {
+					document.getElementById(viewerId).classList.remove('active');
+					document.body.style.overflow = '';
+				}
+			};
             
             // 图片加载
             const imageLoader = {
