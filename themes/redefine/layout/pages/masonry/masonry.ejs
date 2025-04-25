@@ -25,6 +25,11 @@
 <script>
     (function() {
         function initMasonry() {
+            // 首先删除任何包含 image-viewer-container 类的 div
+            document.querySelectorAll('div.image-viewer-container').forEach(el => {
+                el.remove();
+            });
+            
             // 核心元素
             const masonryGrid = document.getElementById('masonry-grid');
             const loadMoreBtn = document.getElementById('load-more-btn');
