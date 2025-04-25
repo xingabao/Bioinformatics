@@ -20,6 +20,7 @@
 
 <div class="load-more-container">
     <button id="load-more-btn" class="load-more-btn">加载更多</button>
+    <div id="loading-spinner" class="loading-spinner" style="display: none;"></div>
 </div>
 
 <script>
@@ -33,6 +34,7 @@
             const loadMoreBtn = document.getElementById('load-more-btn');
             const loadingPlaceholder = document.getElementById('loading-placeholder');
             const noImagesMessage = document.getElementById('no-images-message');
+            const loadingSpinner = document.getElementById('loading-spinner');
             
             // 配置项
             const batchSize = 10;
@@ -82,6 +84,7 @@
                     loadMoreBtn.textContent = isLoading ? '加载中...' : '加载更多';
                     loadMoreBtn.disabled = isLoading;
                     loadMoreBtn.classList.toggle('loading', isLoading);
+                    loadingSpinner.style.display = isLoading ? 'block' : 'none';
                 },
                 
                 // 设置行跨度
@@ -149,6 +152,7 @@
                                 <div class="image-title">${imageData.title || ''}</div>
                                 <div class="image-description">${imageData.description || ''}</div>
                             </div>
+                            <div class="image-loading-spinner"></div>
                         </div>
                     `;
                     
@@ -183,6 +187,12 @@
                             placeholder.style.display = 'none';
                         }
                         
+                        // 隐藏当前图片的加载转圈圈
+                        const spinner = item.querySelector('.image-loading-spinner');
+                        if (spinner) {
+                            spinner.style.display = 'none';
+                        }
+                        
                         if (++loadedCount >= totalToLoad) {
                             utils.setLoadingState(false);
                         }
@@ -194,8 +204,22 @@
                                 if (entry.isIntersecting) {
                                     const img = entry.target;
                                     img.classList.add('loading');
+                                    
+                                    // 显示当前图片的加载转圈圈
+                                    const item = img.closest('.masonry-item');
+                                    const spinner = item.querySelector('.image-loading-spinner');
+                                    if (spinner) {
+                                        spinner.style.display = 'block';
+                                    }
+                                    
                                     img.onload = () => onImageLoad(img);
-                                    img.onerror = () => loadedCount++;
+                                    img.onerror = () => {
+                                        loadedCount++;
+                                        const spinner = item.querySelector('.image-loading-spinner');
+                                        if (spinner) {
+                                            spinner.style.display = 'none';
+                                        }
+                                    };
                                     img.src = img.dataset.src;
                                     imageObserver.unobserve(img);
                                 }
@@ -206,8 +230,22 @@
                     } else {
                         lazyImages.forEach(img => {
                             img.classList.add('loading');
+                            
+                            // 显示当前图片的加载转圈圈
+                            const item = img.closest('.masonry-item');
+                            const spinner = item.querySelector('.image-loading-spinner');
+                            if (spinner) {
+                                spinner.style.display = 'block';
+                            }
+                            
                             img.onload = () => onImageLoad(img);
-                            img.onerror = () => loadedCount++;
+                            img.onerror = () => {
+                                loadedCount++;
+                                const spinner = item.querySelector('.image-loading-spinner');
+                                if (spinner) {
+                                    spinner.style.display = 'none';
+                                }
+                            };
                             img.src = img.dataset.src;
                         });
                     }
@@ -471,6 +509,40 @@
         font-size: 16px;
     }
     
+    /* 加载旋转动画 */
+    .loading-spinner, .image-loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        border-radius: 50%;
+        border-top-color: #3498db;
+        margin: 20px auto 0;
+        animation: spin 1s ease-in-out infinite;
+    }
+    
+    .image-loading-spinner {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 30px;
+        height: 30px;
+        border-width: 3px;
+        z-index: 4;
+        background-color: rgba(255, 255, 255, 0.7);
+        padding: 10px;
+        border-radius: 50%;
+        display: none;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    
+    .image-loading-spinner {
+        animation: spin 1s ease-in-out infinite;
+    }
+    
     @keyframes loading-animation {
         0% { background-position: 200% 0; }
         100% { background-position: -200% 0; }
@@ -489,6 +561,12 @@
         
         #viewer-image {
             max-height: 80vh;
+        }
+        
+        .image-loading-spinner {
+            width: 25px;
+            height: 25px;
+            border-width: 2px;
         }
     }
 </style>
