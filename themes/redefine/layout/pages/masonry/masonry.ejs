@@ -25,12 +25,10 @@
 <script>
     (function() {
         function initMasonry() {
-            // 首先删除任何包含 image-viewer-container 类的 div
-            document.querySelectorAll('div.image-viewer-container').forEach(el => {
-                el.remove();
-            });
+            // 清理已存在的查看器
+            document.querySelectorAll('div.image-viewer-container').forEach(el => el.remove());
             
-            // 核心元素
+            // 获取DOM元素
             const masonryGrid = document.getElementById('masonry-grid');
             const loadMoreBtn = document.getElementById('load-more-btn');
             const loadingPlaceholder = document.getElementById('loading-placeholder');
@@ -50,7 +48,7 @@
                 console.error('Error getting image data:', e);
             }
             
-            // 检查图片数据
+            // 无图片处理
             if (!allImages || allImages.length === 0) {
                 noImagesMessage.style.display = 'block';
                 loadMoreBtn.style.display = 'none';
@@ -58,208 +56,206 @@
                 return;
             }
             
-            // 打乱图片数组顺序
-            function shuffleArray(array) {
-                const newArray = [...array];
-                for (let i = newArray.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            // 工具函数
+            const utils = {
+                // 打乱数组
+                shuffleArray(array) {
+                    const newArray = [...array];
+                    for (let i = newArray.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+                    }
+                    return newArray;
+                },
+                
+                // 防抖函数
+                debounce(fn, delay) {
+                    let timer;
+                    return function() {
+                        clearTimeout(timer);
+                        timer = setTimeout(() => fn.apply(this, arguments), delay);
+                    };
+                },
+                
+                // 设置加载状态
+                setLoadingState(isLoading) {
+                    loadMoreBtn.textContent = isLoading ? '加载中...' : '加载更多';
+                    loadMoreBtn.disabled = isLoading;
+                    loadMoreBtn.classList.toggle('loading', isLoading);
+                },
+                
+                // 设置行跨度
+                setRowSpan(item) {
+                    const container = item.querySelector('.image-container');
+                    const rowHeight = 55; // 对应CSS中的grid-auto-rows
+                    const contentHeight = container.offsetHeight;
+                    const rowSpan = Math.ceil(contentHeight / rowHeight);
+                    item.style.gridRow = `span ${rowSpan}`;
                 }
-                return newArray;
-            }
+            };
             
-            // 初始化随机排序
-            allImages = shuffleArray(allImages);
-            
-            // 加载状态控制
-            function setLoadingState(isLoading) {
-                loadMoreBtn.textContent = isLoading ? '加载中...' : '加载更多';
-                loadMoreBtn.disabled = isLoading;
-                loadMoreBtn.classList.toggle('loading', isLoading);
-            }
-            
-            // 隐藏加载占位符
-            function hideLoadingPlaceholder() {
-                loadingPlaceholder.style.display = 'none';
-                masonryGrid.style.display = 'grid';
-            }
-            
-            // 创建图片元素
-            function createImageElement(imageData) {
-                const item = document.createElement('div');
-                item.className = 'masonry-item';
-                
-                item.innerHTML = `
-                    <div class="image-container" data-full-image="${imageData.image}">
-                        <div class="image-placeholder"></div>
-                        <img data-src="${imageData.image}" alt="${imageData.title || ''}" class="lazy-image">
-                        <div class="image-overlay">
-                            <div class="image-title">${imageData.title || ''}</div>
-                            <div class="image-description">${imageData.description || ''}</div>
-                        </div>
-                    </div>
-                `;
-                
-                // 预加载获取尺寸
-                const tempImg = new Image();
-                tempImg.onload = function() {
-                    const ratio = tempImg.width / tempImg.height;
-                    item.querySelector('.image-container').style.paddingBottom = `${(1/ratio) * 100}%`;
-                    setRowSpan(item);
-                };
-                tempImg.src = imageData.image;
-                
-                return item;
-            }
-            
-            // 设置行跨度
-            function setRowSpan(item) {
-                const container = item.querySelector('.image-container');
-                const rowHeight = 40; // 对应CSS中的grid-auto-rows
-                const contentHeight = container.offsetHeight;
-                const rowSpan = Math.ceil(contentHeight / rowHeight);
-                item.style.gridRow = `span ${rowSpan}`;
-            }
-            
-            // 懒加载图片
-            function setupLazyLoading() {
-                const lazyImages = document.querySelectorAll('.lazy-image');
-                let loadedCount = 0;
-                const totalToLoad = lazyImages.length;
-                
-                if (totalToLoad > 0) {
-                    setLoadingState(true);
-                }
-                
-                function onImageLoad(img) {
-                    img.classList.remove('lazy-image', 'loading');
-                    const item = img.closest('.masonry-item');
-                    setRowSpan(item);
-                    
-                    const placeholder = img.previousElementSibling;
-                    if (placeholder?.classList.contains('image-placeholder')) {
-                        placeholder.style.display = 'none';
+            // 图片查看器
+            const imageViewer = {
+                setup() {
+                    if (!document.getElementById('image-viewer')) {
+                        const viewer = document.createElement('div');
+                        viewer.id = 'image-viewer';
+                        viewer.innerHTML = `
+                            <div class="viewer-backdrop"></div>
+                            <div class="viewer-container">
+                                <img id="viewer-image" src="" alt="">
+                                <button class="viewer-close">&times;</button>
+                            </div>
+                        `;
+                        document.body.appendChild(viewer);
+                        
+                        viewer.querySelector('.viewer-backdrop').addEventListener('click', this.close);
+                        viewer.querySelector('.viewer-close').addEventListener('click', this.close);
                     }
                     
-                    if (++loadedCount >= totalToLoad) {
-                        setLoadingState(false);
-                    }
-                }
-                
-                if ('IntersectionObserver' in window) {
-                    const imageObserver = new IntersectionObserver((entries) => {
-                        entries.forEach(entry => {
-                            if (entry.isIntersecting) {
-                                const img = entry.target;
-                                img.classList.add('loading');
-                                img.onload = () => onImageLoad(img);
-                                img.onerror = () => loadedCount++;
-                                img.src = img.dataset.src;
-                                imageObserver.unobserve(img);
-                            }
-                        });
-                    }, { rootMargin: '200px 0px' });
-                    
-                    lazyImages.forEach(img => imageObserver.observe(img));
-                } else {
-                    lazyImages.forEach(img => {
-                        img.classList.add('loading');
-                        img.onload = () => onImageLoad(img);
-                        img.onerror = () => loadedCount++;
-                        img.src = img.dataset.src;
+                    masonryGrid.addEventListener('click', (e) => {
+                        const container = e.target.closest('.image-container');
+                        if (container) {
+                            const fullImageUrl = container.getAttribute('data-full-image');
+                            if (fullImageUrl) this.open(fullImageUrl);
+                        }
                     });
+                },
+                
+                open(imageUrl) {
+                    const viewer = document.getElementById('image-viewer');
+                    document.getElementById('viewer-image').src = imageUrl;
+                    viewer.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                },
+                
+                close() {
+                    document.getElementById('image-viewer').classList.remove('active');
+                    document.body.style.overflow = '';
                 }
-            }
+            };
             
-            // 设置图片查看器
-            function setupImageViewer() {
-                if (!document.getElementById('image-viewer')) {
-                    const viewer = document.createElement('div');
-                    viewer.id = 'image-viewer';
-                    viewer.innerHTML = `
-                        <div class="viewer-backdrop"></div>
-                        <div class="viewer-container">
-                            <img id="viewer-image" src="" alt="">
-                            <button class="viewer-close">&times;</button>
+            // 图片加载
+            const imageLoader = {
+                createImageElement(imageData) {
+                    const item = document.createElement('div');
+                    item.className = 'masonry-item';
+                    
+                    item.innerHTML = `
+                        <div class="image-container" data-full-image="${imageData.image}">
+                            <div class="image-placeholder"></div>
+                            <img data-src="${imageData.image}" alt="${imageData.title || ''}" class="lazy-image">
+                            <div class="image-overlay">
+                                <div class="image-title">${imageData.title || ''}</div>
+                                <div class="image-description">${imageData.description || ''}</div>
+                            </div>
                         </div>
                     `;
-                    document.body.appendChild(viewer);
                     
-                    viewer.querySelector('.viewer-backdrop').addEventListener('click', closeViewer);
-                    viewer.querySelector('.viewer-close').addEventListener('click', closeViewer);
-                }
+                    // 预加载获取尺寸
+                    const tempImg = new Image();
+                    tempImg.onload = function() {
+                        const ratio = tempImg.width / tempImg.height;
+                        item.querySelector('.image-container').style.paddingBottom = `${(1/ratio) * 100}%`;
+                        utils.setRowSpan(item);
+                    };
+                    tempImg.src = imageData.image;
+                    
+                    return item;
+                },
                 
-                masonryGrid.addEventListener('click', (e) => {
-                    const container = e.target.closest('.image-container');
-                    if (container) {
-                        const fullImageUrl = container.getAttribute('data-full-image');
-                        if (fullImageUrl) openViewer(fullImageUrl);
+                setupLazyLoading() {
+                    const lazyImages = document.querySelectorAll('.lazy-image');
+                    let loadedCount = 0;
+                    const totalToLoad = lazyImages.length;
+                    
+                    if (totalToLoad > 0) {
+                        utils.setLoadingState(true);
                     }
-                });
-            }
-            
-            // 打开查看器
-            function openViewer(imageUrl) {
-                const viewer = document.getElementById('image-viewer');
-                document.getElementById('viewer-image').src = imageUrl;
-                viewer.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }
-            
-            // 关闭查看器
-            function closeViewer() {
-                document.getElementById('image-viewer').classList.remove('active');
-                document.body.style.overflow = '';
-            }
-            
-            // 加载更多图片
-            function loadMoreImages() {
-                // 重新洗牌剩余图片
-                if (currentIndex < allImages.length) {
-                    const remainingImages = allImages.slice(currentIndex);
-                    allImages = [
-                        ...allImages.slice(0, currentIndex), 
-                        ...shuffleArray(remainingImages)
-                    ];
-                }
+                    
+                    function onImageLoad(img) {
+                        img.classList.remove('lazy-image', 'loading');
+                        const item = img.closest('.masonry-item');
+                        utils.setRowSpan(item);
+                        
+                        const placeholder = img.previousElementSibling;
+                        if (placeholder?.classList.contains('image-placeholder')) {
+                            placeholder.style.display = 'none';
+                        }
+                        
+                        if (++loadedCount >= totalToLoad) {
+                            utils.setLoadingState(false);
+                        }
+                    }
+                    
+                    if ('IntersectionObserver' in window) {
+                        const imageObserver = new IntersectionObserver((entries) => {
+                            entries.forEach(entry => {
+                                if (entry.isIntersecting) {
+                                    const img = entry.target;
+                                    img.classList.add('loading');
+                                    img.onload = () => onImageLoad(img);
+                                    img.onerror = () => loadedCount++;
+                                    img.src = img.dataset.src;
+                                    imageObserver.unobserve(img);
+                                }
+                            });
+                        }, { rootMargin: '200px 0px' });
+                        
+                        lazyImages.forEach(img => imageObserver.observe(img));
+                    } else {
+                        lazyImages.forEach(img => {
+                            img.classList.add('loading');
+                            img.onload = () => onImageLoad(img);
+                            img.onerror = () => loadedCount++;
+                            img.src = img.dataset.src;
+                        });
+                    }
+                },
                 
-                const endIndex = Math.min(currentIndex + batchSize, allImages.length);
-                
-                // 添加新图片
-                for (let i = currentIndex; i < endIndex; i++) {
-                    if (allImages[i]) {
-                        masonryGrid.appendChild(createImageElement(allImages[i]));
+                loadMoreImages() {
+                    // 重新洗牌剩余图片
+                    if (currentIndex < allImages.length) {
+                        const remainingImages = allImages.slice(currentIndex);
+                        allImages = [
+                            ...allImages.slice(0, currentIndex), 
+                            ...utils.shuffleArray(remainingImages)
+                        ];
+                    }
+                    
+                    const endIndex = Math.min(currentIndex + batchSize, allImages.length);
+                    
+                    // 添加新图片
+                    for (let i = currentIndex; i < endIndex; i++) {
+                        if (allImages[i]) {
+                            masonryGrid.appendChild(this.createImageElement(allImages[i]));
+                        }
+                    }
+                    
+                    currentIndex = endIndex;
+                    this.setupLazyLoading();
+                    
+                    // 处理加载完成情况
+                    if (currentIndex >= allImages.length) {
+                        loadMoreBtn.style.display = 'none';
                     }
                 }
-                
-                currentIndex = endIndex;
-                setupLazyLoading();
-                
-                // 处理加载完成情况
-                if (currentIndex >= allImages.length) {
-                    loadMoreBtn.style.display = 'none';
-                }
-            }
-            
-            // 响应窗口大小变化
-            window.addEventListener('resize', debounce(() => {
-                document.querySelectorAll('.masonry-item').forEach(setRowSpan);
-            }, 100));
-            
-            // 防抖函数
-            function debounce(fn, delay) {
-                let timer;
-                return function() {
-                    clearTimeout(timer);
-                    timer = setTimeout(() => fn.apply(this, arguments), delay);
-                };
-            }
+            };
             
             // 初始化
-            loadMoreBtn.addEventListener('click', loadMoreImages);
-            hideLoadingPlaceholder();
-            loadMoreImages();
-            setupImageViewer();
+            allImages = utils.shuffleArray(allImages);
+            loadingPlaceholder.style.display = 'none';
+            masonryGrid.style.display = 'grid';
+            
+            // 加载初始图片
+            loadMoreBtn.addEventListener('click', () => imageLoader.loadMoreImages());
+            imageViewer.setup();
+            imageLoader.loadMoreImages();
+            
+            // 响应窗口大小变化
+            window.addEventListener('resize', utils.debounce(() => {
+                document.querySelectorAll('.masonry-item').forEach(utils.setRowSpan);
+            }, 100));
         }
 
         // DOM加载检查
@@ -360,13 +356,13 @@
         font-size: 0.9em;
     }
     
+    /* 按钮和加载样式 */
     .load-more-container {
         text-align: center;
         margin: 30px 0;
         padding-top: 20px;
         position: relative;
         z-index: 10;
-        clear: both;
     }
     
     .load-more-btn {
@@ -389,6 +385,7 @@
         cursor: not-allowed;
     }
     
+    /* 加载占位符样式 */
     .loading-placeholder {
         width: 100%;
         margin: 20px 0;
@@ -401,10 +398,13 @@
         justify-content: center;
     }
     
-    .card.loading {
+    .card.loading, .image-placeholder {
         background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
         background-size: 200% 100%;
         animation: loading-animation 1.5s infinite;
+    }
+    
+    .card.loading {
         border-radius: 8px;
     }
     
