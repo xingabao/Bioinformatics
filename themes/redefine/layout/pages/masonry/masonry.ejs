@@ -1,3 +1,20 @@
+<%
+// Define an array of images to display in the masonry layout
+let images = [];
+try {
+  images = theme.masonry || [];
+  if (!Array.isArray(images)) {
+    images = [];
+    console.warn('theme.masonry is not an array, using empty array instead');
+  }
+} catch (e) {
+  console.error('Error accessing theme.masonry:', e);
+}
+
+// 初始加载的图片数量
+const initialLoadCount = Math.min(10, images.length);
+%>
+
 <h1 class="page-title-header">
     <%- getPageTitle(page) %>
 </h1>
@@ -23,7 +40,20 @@
     // 确保脚本在DOM完全加载后执行
     (function() {
         // 获取所有图片数据
-        let allImages = <%- JSON.stringify(images) %>;
+        let allImages = [];
+        try {
+            allImages = <%- JSON.stringify(images || []) %>;
+            if (!Array.isArray(allImages) || allImages.length === 0) {
+                console.warn('No images found or images is not an array');
+                // 可以在这里设置一些默认图片或显示提示
+                document.querySelector('.loading-placeholder').innerHTML = '<p>No images available</p>';
+                document.getElementById('load-more-btn').style.display = 'none';
+                return;
+            }
+        } catch (e) {
+            console.error('Error parsing images:', e);
+            return;
+        }
         
         // 打乱图片数组顺序
         function shuffleArray(array) {
