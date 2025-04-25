@@ -408,16 +408,18 @@ const initialLoadCount = 10;
     }
     
     .load-more-container {
-        text-align: center;
-        margin: 30px 0;
+        display: flex;
+        justify-content: center; /* 水平居中 */
+        align-items: center; /* 垂直居中 */
+        margin: 30px auto; /* 上下间距30px，左右自动居中 */
         padding-top: 20px; /* 增加顶部空间，防止按钮被图片覆盖 */
         position: relative; /* 确保不被覆盖 */
         z-index: 10; /* 提高层级 */
-        clear: both;
+        width: 100%; /* 占满整个容器宽度 */
     }
     
     .load-more-btn {
-        padding: 10px 20px;
+        padding: 10px 30px; /* 增加左右内边距使按钮更宽 */
         background-color: #3498db;
         color: white;
         border: none;
@@ -425,6 +427,8 @@ const initialLoadCount = 10;
         font-size: 16px;
         cursor: pointer;
         transition: background-color 0.3s ease;
+        margin: 0 auto; /* 确保按钮水平居中 */
+        display: block; /* 使margin: 0 auto生效 */
     }
     
     .load-more-btn:hover {
@@ -515,7 +519,7 @@ const initialLoadCount = 10;
     @media (max-width: 576px) {
         .card.loading {
             width: 100%;
-            height: 150px;
+            height: 100px;
         }
         
         #masonry-grid {
@@ -525,6 +529,11 @@ const initialLoadCount = 10;
         
         .modal-content {
             max-width: 95%;
+        }
+        
+        .load-more-btn {
+            padding: 8px 20px; /* 移动端稍微缩小按钮 */
+            font-size: 14px;
         }
     }
 </style>
