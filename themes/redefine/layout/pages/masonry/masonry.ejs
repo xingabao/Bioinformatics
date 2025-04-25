@@ -29,6 +29,13 @@ const initialLoadCount = 10;
     <button id="load-more-btn" class="load-more-btn">加载更多</button>
 </div>
 
+<!-- 添加大图查看模态框 -->
+<div id="image-modal" class="image-modal">
+    <span class="close-modal">&times;</span>
+    <img id="modal-image" class="modal-content">
+    <div id="modal-caption"></div>
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // 获取所有图片数据
@@ -56,6 +63,57 @@ const initialLoadCount = 10;
         const masonryGrid = document.getElementById('masonry-grid');
         const loadMoreBtn = document.getElementById('load-more-btn');
         const loadingPlaceholder = document.querySelector('.loading-placeholder');
+        
+        // 模态框元素
+        const modal = document.getElementById('image-modal');
+        const modalImg = document.getElementById('modal-image');
+        const modalCaption = document.getElementById('modal-caption');
+        const closeModal = document.querySelector('.close-modal');
+        
+        // 关闭模态框
+        if (closeModal) {
+            closeModal.onclick = function() {
+                modal.style.display = "none";
+            }
+        }
+        
+        // 点击模态框外部关闭
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        }
+        
+        // 添加图片点击事件处理
+        function setupImageClickHandlers() {
+            const images = document.querySelectorAll('.masonry-item img:not(.has-click-handler)');
+            images.forEach(img => {
+                img.classList.add('has-click-handler'); // 标记已添加点击处理器
+                img.addEventListener('click', function() {
+                    modal.style.display = "block";
+                    modalImg.src = this.src;
+                    
+                    // 获取标题和描述
+                    const overlayDiv = this.nextElementSibling;
+                    if (overlayDiv) {
+                        const title = overlayDiv.querySelector('.image-title');
+                        const description = overlayDiv.querySelector('.image-description');
+                        let captionText = "";
+                        
+                        if (title && title.textContent) {
+                            captionText += title.textContent;
+                        }
+                        
+                        if (description && description.textContent) {
+                            if (captionText) captionText += " - ";
+                            captionText += description.textContent;
+                        }
+                        
+                        modalCaption.textContent = captionText;
+                    }
+                });
+            });
+        }
         
         // 隐藏加载占位符
         function hideLoadingPlaceholder() {
@@ -107,7 +165,9 @@ const initialLoadCount = 10;
         
         // 懒加载图片
         function setupLazyLoading() {
-            const lazyImages = document.querySelectorAll('.lazy-image');
+            const lazyImages = document.querySelectorAll('.lazy-image:not(.loading)');
+            let imagesLoaded = 0;
+            let totalImages = lazyImages.length;
             
             if ('IntersectionObserver' in window) {
                 const imageObserver = new IntersectionObserver((entries) => {
@@ -130,6 +190,16 @@ const initialLoadCount = 10;
                                 const placeholder = img.previousElementSibling;
                                 if (placeholder && placeholder.classList.contains('image-placeholder')) {
                                     placeholder.style.display = 'none';
+                                }
+                                
+                                // 跟踪加载进度
+                                imagesLoaded++;
+                                
+                                // 当所有图片加载完毕时显示加载更多按钮
+                                if (imagesLoaded >= totalImages) {
+                                    loadMoreBtn.style.display = 'block';
+                                    // 设置点击处理程序
+                                    setupImageClickHandlers();
                                 }
                             };
                             
@@ -158,14 +228,33 @@ const initialLoadCount = 10;
                         if (placeholder && placeholder.classList.contains('image-placeholder')) {
                             placeholder.style.display = 'none';
                         }
+                        
+                        // 跟踪加载进度
+                        imagesLoaded++;
+                        
+                        // 当所有图片加载完毕时显示加载更多按钮
+                        if (imagesLoaded >= totalImages) {
+                            loadMoreBtn.style.display = 'block';
+                            // 设置点击处理程序
+                            setupImageClickHandlers();
+                        }
                     };
                     img.src = img.dataset.src;
                 });
+            }
+            
+            // 如果没有图片需要加载，直接显示按钮并设置点击处理程序
+            if (totalImages === 0) {
+                loadMoreBtn.style.display = 'block';
+                setupImageClickHandlers();
             }
         }
         
         // 加载更多图片
         function loadMoreImages() {
+            // 隐藏加载更多按钮直到加载完成
+            loadMoreBtn.style.display = 'none';
+            
             // 每次加载前，对剩余的图片重新洗牌
             if (currentIndex < allImages.length) {
                 const remainingImages = allImages.slice(currentIndex);
@@ -213,6 +302,8 @@ const initialLoadCount = 10;
         function init() {
             hideLoadingPlaceholder();
             loadMoreImages();
+            // 为初始加载的图片添加点击事件
+            setupImageClickHandlers();
         }
         
         // 开始初始化
@@ -282,6 +373,7 @@ const initialLoadCount = 10;
         height: 100%;
         object-fit: cover; /* 保持图片比例并填充容器 */
         z-index: 2;
+        cursor: pointer; /* 添加指针样式表明可点击 */
     }
     
     .lazy-image {
@@ -360,6 +452,57 @@ const initialLoadCount = 10;
         border-radius: 8px;
     }
     
+    /* 大图查看模态框样式 */
+    .image-modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        padding-top: 50px;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.9);
+    }
+    
+    .modal-content {
+        margin: auto;
+        display: block;
+        max-width: 90%;
+        max-height: 80vh;
+        object-fit: contain;
+    }
+    
+    #modal-caption {
+        margin: auto;
+        display: block;
+        width: 80%;
+        max-width: 700px;
+        text-align: center;
+        color: #ccc;
+        padding: 10px 0;
+        height: 50px;
+    }
+    
+    .close-modal {
+        position: absolute;
+        top: 15px;
+        right: 35px;
+        color: #f1f1f1;
+        font-size: 40px;
+        font-weight: bold;
+        transition: 0.3s;
+        cursor: pointer;
+    }
+    
+    .close-modal:hover,
+    .close-modal:focus {
+        color: #bbb;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    
     @keyframes loading-animation {
         0% {
             background-position: 200% 0;
@@ -378,6 +521,10 @@ const initialLoadCount = 10;
         #masonry-grid {
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             grid-gap: 10px;
+        }
+        
+        .modal-content {
+            max-width: 95%;
         }
     }
 </style>
