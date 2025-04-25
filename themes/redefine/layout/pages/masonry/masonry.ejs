@@ -95,7 +95,7 @@ const initialLoadCount = 7;
         // 设置行跨度
         function setRowSpan(item) {
             const container = item.querySelector('.image-container');
-            const rowHeight = 40; // 与CSS中的grid-auto-rows保持一致
+            const rowHeight = 55; // 与CSS中的grid-auto-rows保持一致
             const contentHeight = container.offsetHeight;
             const rowSpan = Math.ceil(contentHeight / rowHeight);
             item.style.gridRow = `span ${rowSpan}`;
@@ -367,7 +367,7 @@ const initialLoadCount = 7;
     
     @media (max-width: 576px) {
         .card.loading {
-            width: 100px;
+            width: 100%;
             height: 150px;
         }
         
