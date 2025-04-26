@@ -66,7 +66,7 @@ global:
       family:  # Font family
       url:  # Font URL to CSS file
   # Content max width
-  content_max_width: 1080px
+  content_max_width: 1200px
   # Sidebar width
   sidebar_width: 360px
   # Effects on mouse hover
@@ -187,7 +187,7 @@ home_banner:
 # Docs: https://redefine-docs.ohevan.com/home/navbar
 navbar:
   # Auto hide navbar
-  auto_hide: false
+  auto_hide: true
   # Navbar background color
   color:
     left: "#f78736"   #left side 
@@ -338,7 +338,7 @@ articles:
   # Article recommendation. Requires nodejieba (npm install nodejieba). Transplanted from hexo-theme-volantis.
   recommendation:
     # Whether to enable article recommendation
-    enable: false
+    enable: true
     # Article recommendation title
     title: 推荐阅读
     # Max number of articles to display
