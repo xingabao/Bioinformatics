@@ -198,6 +198,43 @@ span[alt="btn"]:hover {
     background-color:inherit !important;
 }
 
+// 抖音字效 
+@-webkit-keyframes uk-text-shadow-glitch{0%{text-shadow:none}25%{text-shadow:-1px -1px 0 #ff0048,1px 1px 0 #3234ff}50%{text-shadow:1px -1px 0 #ff0048,-1px 1px 0 #3234ff}75%{text-shadow:-1px 1px 0 #ff0048,1px -1px 0 #3234ff}to{text-shadow:1px 1px 0 #ff0048,-1px -1px 0 #3234ff}}@keyframes uk-text-shadow-glitch{0%{text-shadow:none}25%{text-shadow:-1px -1px 0 #ff0048,1px 1px 0 #3234ff}50%{text-shadow:1px -1px 0 #ff0048,-1px 1px 0 #3234ff}75%{text-shadow:-1px 1px 0 #ff0048,1px -1px 0 #3234ff}to{text-shadow:1px 1px 0 #ff0048,-1px -1px 0 #3234ff}}
+span[alt="shake"] {
+    -webkit-animation: uk-text-shadow-glitch .95s cubic-bezier(1,-1.91,0,2.79) 0s infinite normal both running;
+    animation: uk-text-shadow-glitch .95s cubic-bezier(1,-1.91,0,2.79) 0s infinite normal both running;
+}
+
+// https://www.jq22.com/webqd4214（爱是一道光，绿到你发慌）
+span[alt="glow"] {
+	font-family:'Audiowide';
+	text-align:center;
+	/*color:black;*/
+	-webkit-transition:all 1.5s ease;
+	transition:all 1.5s ease;
+}
+span[alt="glow"]:hover {
+    color:#00a67c;
+	-webkit-animation:Glow 1.5s ease infinite alternate;
+	animation:Glow 1.5s ease infinite alternate;
+}
+@-webkit-keyframes Glow {
+	from {
+	text-shadow:0 0 10px #fff,0 0 20px #fff,0 0 30px #fff,0 0 40px #00a67c,0 0 70px #00a67c,0 0 80px #00a67c,0 0 100px #00a67c,0 0 150px #00a67c;
+}
+to {
+	text-shadow:0 0 5px #fff,0 0 10px #fff,0 0 15px #fff,0 0 20px #00a67c,0 0 35px #00a67c,0 0 40px #00a67c,0 0 50px #00a67c,0 0 75px #00a67c;
+}
+}@keyframes Glow {
+	from {
+	text-shadow:0 0 10px #fff,0 0 20px #fff,0 0 30px #fff,0 0 40px #00a67c,0 0 70px #00a67c,0 0 80px #00a67c,0 0 100px #00a67c,0 0 150px #00a67c;
+}
+to {
+	text-shadow:0 0 5px #fff,0 0 10px #fff,0 0 15px #fff,0 0 20px #00a67c,0 0 35px #00a67c,0 0 40px #00a67c,0 0 50px #00a67c,0 0 75px #00a67c;
+}
+}
+
+
 // 自定义 ====================================================================
 
 // html, body
