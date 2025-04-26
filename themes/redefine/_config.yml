@@ -52,7 +52,7 @@ global:
   fonts:
     # Chinese fonts
     chinese: 
-      enable: false # Whether to enable custom chinese fonts
+      enable: true # Whether to enable custom chinese fonts
       family:  # Font family
       url:  # Font URL to CSS file
     # English fonts
@@ -68,14 +68,14 @@ global:
   # Content max width
   content_max_width: 1200px
   # Sidebar width
-  sidebar_width: 360px
+  sidebar_width: 480px
   # Effects on mouse hover
   hover:
     shadow: true # shadow effect
-    scale: false # scale effect
+    scale: true # scale effect
   # Scroll progress
   scroll_progress:
-    bar: false # progress bar
+    bar: true # progress bar
     percentage: true # percentage
   # Website counter
   website_counter:
@@ -88,7 +88,7 @@ global:
   single_page: true
   # Whether to enable Preloader.
   preloader:
-    enable: false
+    enable: true
     custom_message: # Custom message. If empty, the site title will be displayed
   # Whether to enable open graph
   open_graph:
