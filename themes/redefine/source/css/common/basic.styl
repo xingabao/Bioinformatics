@@ -15,171 +15,130 @@ redefine-mobile()
 *
   transition-g()
 
-// ==========================================================================
-/&zwnj;** 小标签 **&zwnj;/
-font
-  display: inline
-  padding: .2em .2em
-  font-size: 90%
-  font-weight: 400
-  line-height: 1
-  color: #fff
-  text-align: center
-  /*white-space: nowrap*/
-  vertical-align: baseline
-  border-radius: .1rem
-  border-radius: 6px
-  background-color: var(--spannote-color)
+// 自定义 ====================================================================
+/** 小标签 **/
+font {
+    display: inline;
+    padding: .2em .6em;
+    font-size: 90%;
+    font-weight: 400;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    /*white-space: nowrap;*/
+    vertical-align: baseline;
+    border-radius: .1rem;
+    border-radius: 6px;
+    background-color: var(--spannote-color);
+}
+font[title="red"] {
+    background-color:#e91e64;
+}
+font[title="blue"] {
+    background-color:#02aaf4;
+}
+font[title="yellow"] {
+    background-color:#ffc50a;
+}
+font[title="green"] {
+    background-color:#8bc34a;
+}
+font[title="gray"] {
+    background-color:#4c4c4c;
+}
 
-  &[title="red"]
-    background-color: #e91e64
-  
-  &[title="blue"]
-    background-color: #02aaf4
-  
-  &[title="yellow"]
-    background-color: #ffc50a
-  
-  &[title="green"]
-    background-color: #8bc34a
-  
-  &[title="gray"]
-    background-color: #4c4c4c
+/** 强调型文本 **/
+span[alt='emp'] {
+    border-bottom: 4px dotted var(--emptext-color);
+}
+span[alt='underline'] {
+    border-bottom: 2px solid var(--emptext-color);
+}
+span[alt='wavy'] {
+    text-decoration-style: wavy;
+    text-decoration-line: underline;
+    text-decoration-color: var(--emptext-color);
+}
 
-/&zwnj;** 强调型文本 **&zwnj;/
-span[alt='emp']
-  border-bottom: 4px dotted var(--emptext-color)
-
-span[alt='underline']
-  border-bottom: 2px solid var(--emptext-color)
-
-span[alt='wavy']
-  text-decoration-style: wavy
-  text-decoration-line: underline
-  text-decoration-color: var(--emptext-color)
-
-/&zwnj;** 折叠标签 **&zwnj;/
-details
-  display: block
-  padding: 16px
-  margin: 1em 0
-  border-radius: 4px
-  background: var(--bg-color)
-  font-size: 14px
-  transition: all .28s ease
-  border: 1px solid var(--bg-color)
-
-summary
-  display: list-item
-
-details summary
-  cursor: pointer
-  padding: 16px
-  margin: -16px
-  border-radius: 4px
-  color: var(--detailstxt-color)
-  font-size: .875rem !important
-  font-weight: 700
-  position: relative
-  line-height: normal
-
-details > summary
-  background: var(--detailsbg-color)
-
-details[open]
-  border-color: var(--detailsborder-color)
-
-details[open] > summary
-  color: #444
-  margin-bottom: 0
-  border-bottom: 1px solid var(--detailsborder-color)
-  border-bottom-left-radius: 0
-  border-bottom-right-radius: 0
+/** 折叠标签 **/
+details {
+    display: block;
+    padding: 16px;
+    margin: 1em 0;
+    border-radius: 4px;
+    background: var(--bg-color);
+    font-size: 14px;
+    -webkit-transition: all .28s ease;
+    -moz-transition: all .28s ease;
+    -o-transition: all .28s ease;
+    -ms-transition: all .28s ease;
+    transition: all .28s ease;
+    -moz-transition: all .28s ease;
+    -webkit-transition: all .28s ease;
+    -o-transition: all .28s ease;
+    border: 1px solid var(--bg-color);
+}
+summary {
+    display: list-item;
+}
+details summary {
+    cursor: pointer;
+    padding: 16px;
+    margin: -16px;
+    border-radius: 4px;
+    color: var(--detailstxt-color);
+    font-size: .875rem!important;
+    font-weight: 700;
+    position: relative;
+    line-height: normal;
+}
+details>summary {
+    background: var(--detailsbg-color);
+}
+details[open] {
+    border-color: var(--detailsborder-color);
+}
+details[open]>summary {
+    color: #444;
+    margin-bottom: 0;
+}
+details[open]>summary {
+    border-bottom: 1px solid var(--detailsborder-color);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
 
 /* 折叠框、视频、音频标签点击时候会出现黑色边框，极不美观，去除 */
-summary:focus
-  outline: none !important
+summary:focus {
+    outline: none !important;
+}
+video:focus{
+    outline: none !important;
+}
+audio:focus{
+    outline: none !important;
+}
 
-video:focus
-  outline: none !important
+/** 隐藏型文本 **/
+span[alt="hide"] {
+    color: transparent;
+    background: var(--hidetextcover-color);
+    border-radius: 2px;
+    -webkit-transition: all .28s ease;
+    -moz-transition: all .28s ease;
+    -o-transition: all .28s ease;
+    -ms-transition: all .28s ease;
+    transition: all .28s ease;
+    -moz-transition: all .28s ease;
+    -webkit-transition: all .28s ease;
+    -o-transition: all .28s ease;
+}
+span[alt="hide"]:hover {
+    color:var(--hidetext-color);
+    background:0 0
+}
 
-audio:focus
-  outline: none !important
-
-/&zwnj;** 隐藏型文本 **&zwnj;/
-span[alt="hide"]
-  color: transparent
-  background: var(--hidetextcover-color)
-  border-radius: 2px
-  transition: all .28s ease
-  &:hover
-    color: var(--hidetext-color)
-    background: 0 0
-
-/&zwnj;** 彩虹变换字体特效（来自黑石博客） **&zwnj;/
-@keyframes rainbowan
-  to
-    background-position: -2000vw
-
-span[alt="rainbow"], span[alt="rainbow"] *
-  padding-top: 3px
-  background-image: linear-gradient(to left, orangered, orange, gold, lightgreen, cyan, dodgerblue, mediumpurple, hotpink, orangered)
-  background-size: 110vw
-  -webkit-background-clip: text
-  background-clip: text
-  color: transparent
-  animation: rainbowan 60s linear infinite
-
-/&zwnj;** 一款时尚的span字体，来自QinXS **&zwnj;/
-span[alt="modern"]
-  display: inline
-  padding: 5px 10px
-  border-radius: 20px
-  font-family: var(--body-font)
-  font-size: 1em
-  letter-spacing: .2em
-  color: red
-  text-shadow: 0 8px 9px #c4b59d, 0 -2px 1px #fff
-  font-weight: 700
-  background: linear-gradient(to bottom, #ece4d9 0, #e9dfd1 100%)
-
-/&zwnj;** volantis文本按钮样式 **&zwnj;/
-span[alt="btn"]
-  color: var(--spanbtn-color)
-  border: 1px solid var(--spanbtn-color)
-  padding: 3px 4px 2px
-  margin: 4px
-  line-height: 1.1
-  border-radius: 2px
-  &:hover
-    color: var(--focus-color)
-    border: 1px solid var(--focus-color)
-
-#write
-  span[alt="btn"]
-    a
-      color: var(--spanbtn-color)
-      border-bottom: none
-      background-color: inherit
-      transition: none
-    &:hover a
-      color: var(--focus-color) !important
-      background-color: inherit !important
-
-/&zwnj;** 抖音字效 **&zwnj;/
-@keyframes uk-text-shadow-glitch
-  0%
-    text-shadow: none
-  25%
-    text-shadow: -1px -1px 0 #ff0048, 1px 1px 0 #3234ff
-  50%
-    text-shadow: 1px -1px 0 #ff0048, -1px 1px 0 #3234ff
-  75%
-    text-shadow: -1px 1px 0 #ff0048, 1px -1px 0 #3234ff
-  to
-    text-shadow: 1px 1px 0 #ff0048, -1px -1px 0 #3234ff
-	
-// ==========================================================================
+// 自定义 ====================================================================
 
 // html, body
 html, body
