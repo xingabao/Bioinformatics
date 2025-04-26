@@ -445,9 +445,9 @@ plugins:
     enable: true # Whether to enable
     type: fixed # fixed, mini
     audios:
-      - name: # audio name
-        artist: # audio artist
-        url: # audio url
+      - name: Call of Silence # audio name
+        artist: 澤野弘之 # audio artist
+        url: /audios/Call of Silence.flac # audio url
         cover: # audio cover url
         lrc: # audio cover lrc
 #      - name: # audio name
