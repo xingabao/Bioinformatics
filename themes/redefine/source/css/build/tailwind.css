@@ -1948,7 +1948,7 @@ video {
 	}
 
 	.md\:text-6xl {
-		font-size: 3.01rem;
+		font-size: 3.01rem !important;
 		line-height: 1
 	}
 
