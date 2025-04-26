@@ -68,7 +68,7 @@ global:
   # Content max width
   content_max_width: 1200px
   # Sidebar width
-  sidebar_width: 480px
+  sidebar_width: 360px
   # Effects on mouse hover
   hover:
     shadow: true # shadow effect
