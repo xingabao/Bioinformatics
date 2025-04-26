@@ -16,10 +16,10 @@ redefine-mobile()
   transition-g()
 
 // 自定义 ====================================================================
-/** 小标签 **/
+// 小标签
 font {
     display: inline;
-    padding: .2em .6em;
+    padding: .2em .2em;
     font-size: 90%;
     font-weight: 400;
     line-height: 1;
@@ -47,7 +47,7 @@ font[title="gray"] {
     background-color:#4c4c4c;
 }
 
-/** 强调型文本 **/
+// 强调型文本
 span[alt='emp'] {
     border-bottom: 4px dotted var(--emptext-color);
 }
@@ -60,7 +60,7 @@ span[alt='wavy'] {
     text-decoration-color: var(--emptext-color);
 }
 
-/** 折叠标签 **/
+// 折叠标签
 details {
     display: block;
     padding: 16px;
@@ -108,7 +108,7 @@ details[open]>summary {
     border-bottom-right-radius: 0;
 }
 
-/* 折叠框、视频、音频标签点击时候会出现黑色边框，极不美观，去除 */
+// 折叠框、视频、音频标签点击时候会出现黑色边框，极不美观，去除
 summary:focus {
     outline: none !important;
 }
@@ -119,7 +119,7 @@ audio:focus{
     outline: none !important;
 }
 
-/** 隐藏型文本 **/
+// 隐藏型文本
 span[alt="hide"] {
     color: transparent;
     background: var(--hidetextcover-color);
@@ -136,6 +136,66 @@ span[alt="hide"] {
 span[alt="hide"]:hover {
     color:var(--hidetext-color);
     background:0 0
+}
+
+// 彩虹变换字体特效（来自黑石博客）
+@-webkit-keyframes rainbowan {
+    to {
+        background-position: -2000vw;
+    }
+}
+@keyframes rainbowan {
+    to {
+        background-position: -2000vw;
+    }
+}
+span[alt="rainbow"], span[alt="rainbow"] * {
+    padding-top: 3px;
+    background-image: linear-gradient( to left, orangered, orange, gold, lightgreen, cyan, dodgerblue, mediumpurple, hotpink, orangered);
+    background-size: 110vw;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-animation: rainbowan 60s linear infinite;
+    animation: rainbowan 60s linear infinite;
+}
+
+// 一款时尚的 span 字体，来自 QinXS
+span[alt="modern"] {
+    display: inline;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-family: var(--body-font);
+    font-size: 1em;
+    letter-spacing: .2em;
+    color: red;
+    text-shadow: 0 8px 9px #c4b59d, 0 -2px 1px #fff;
+    font-weight: 700;
+    background: linear-gradient(to bottom,#ece4d9 0,#e9dfd1 100%);
+}
+
+// volantis 文本按钮样式
+span[alt="btn"] {
+    color: var(--spanbtn-color);
+    border: 1px solid var(--spanbtn-color);
+    padding: 3px 4px 2px;
+    margin: 4px;
+    line-height: 1.1;
+    border-radius: 2px;
+}
+#write span[alt="btn"] a{
+    color: var(--spanbtn-color);
+    border-bottom:none;
+    background-color:inherit;
+    transition: none;
+}
+span[alt="btn"]:hover {
+    color: var(--focus-color);
+    border: 1px solid var(--focus-color);
+}
+#write span[alt="btn"]:hover a{
+    color: var(--focus-color) !important;
+    background-color:inherit !important;
 }
 
 // 自定义 ====================================================================
