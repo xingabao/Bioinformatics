@@ -205,35 +205,113 @@ span[alt="shake"] {
     animation: uk-text-shadow-glitch .95s cubic-bezier(1,-1.91,0,2.79) 0s infinite normal both running;
 }
 
-// https://www.jq22.com/webqd4214（爱是一道光，绿到你发慌）
-span[alt="glow"] {
-	font-family:'Audiowide';
-	text-align:center;
-	/*color:black;*/
-	-webkit-transition:all 1.5s ease;
-	transition:all 1.5s ease;
+// 时间轴（来自Volantis主题）
+div[alt="timeline"] {
+    margin-top: 8px;
+    margin-left: 8px;
 }
-span[alt="glow"]:hover {
-    color:#00a67c;
-	-webkit-animation:Glow 1.5s ease infinite alternate;
-	animation:Glow 1.5s ease infinite alternate;
+div[alt="timenode"] {
+    position: relative;
 }
-@-webkit-keyframes Glow {
-	from {
-	text-shadow:0 0 10px #fff,0 0 20px #fff,0 0 30px #fff,0 0 40px #00a67c,0 0 70px #00a67c,0 0 80px #00a67c,0 0 100px #00a67c,0 0 150px #00a67c;
+div[alt="timenode"]:after, div[alt="timenode"]:before {
+    content: "";
+    z-index: 1;
+    position: absolute;
+    background: rgba(68,215,182,.5);
+    width: 2px;
+    left: 7px;
 }
-to {
-	text-shadow:0 0 5px #fff,0 0 10px #fff,0 0 15px #fff,0 0 20px #00a67c,0 0 35px #00a67c,0 0 40px #00a67c,0 0 50px #00a67c,0 0 75px #00a67c;
+div[alt="timenode"]:before {
+    top: 0px;
+    height: 6px;
 }
-}@keyframes Glow {
-	from {
-	text-shadow:0 0 10px #fff,0 0 20px #fff,0 0 30px #fff,0 0 40px #00a67c,0 0 70px #00a67c,0 0 80px #00a67c,0 0 100px #00a67c,0 0 150px #00a67c;
+div[alt="timenode"] div[alt="body"], div[alt="timenode"] div[alt="meta"] {
+    max-width: calc(100% - 24px);
 }
-to {
-	text-shadow:0 0 5px #fff,0 0 10px #fff,0 0 15px #fff,0 0 20px #00a67c,0 0 35px #00a67c,0 0 40px #00a67c,0 0 50px #00a67c,0 0 75px #00a67c;
+div[alt="timenode"] div[alt="meta"] {
+    position: relative;
+    color: var(--para-color);
+    line-height: 32px;
+    font-size: .8rem;
+    font-weight: 700;
+    margin: 0 0 0 24px;
 }
+div[alt="timenode"] div[alt="meta"]:after, div[alt="timenode"] div[alt="meta"]:before {
+    content: "";
+    position: absolute;
+    top: 8px;
+    z-index: 2;
+    left: -24px;
+}
+div[alt="timenode"] div[alt="meta"]:before {
+    background: rgba(68,215,182,.5);
+    width: 16px;
+    height: 16px;
+    border-radius: 8px;
+}
+div[alt="timenode"] div[alt="meta"]:after {
+    background: #44d7b6;
+    margin-left: 2px;
+    margin-top: 2px;
+    width: 12px;
+    height: 12px;
+    border-radius: 6px;
+    -webkit-transform: scale(.5);
+    -moz-transform: scale(.5);
+    -o-transform: scale(.5);
+    -ms-transform: scale(.5);
+    transform: scale(.5);
+}
+div[alt="timenode"] div[alt="body"] {
+    margin: 4px 0 10px 24px;
+    padding: 10px;
+    border-radius: 12px;
+    background: var(--timebodybg-color);
+    display: inline-block;
+    font-size: .9rem;
+}
+div[alt="timenode"]:not(:last-child):after {
+    top: 26px;
+    height: calc(100% - 26px);
+}
+div[alt="timenode"]:last-child:after {
+    top: 26px;
+    height: calc(100% - 30px);
+}
+div[alt="timenode"]:hover div[alt="meta"]{
+    color: var(--para-color);
+}
+div[alt="timenode"]:hover div[alt="meta"]:before{
+    background:rgba(255,87,34,.5)
+}
+div[alt="timenode"]:hover div[alt="meta"]:after{
+    background:#ff5722;-webkit-transform:scale(1);
+    -moz-transform:scale(1);
+    -o-transform:scale(1);
+    -ms-transform:scale(1);
+    transform:scale(1);
 }
 
+// 参考链接样式修改（隐藏链接部分，只显示标题）
+.footnotes.md-def-link .md-def-split, .footnotes .md-def-url {
+    display: none;
+}
+.footnotes.md-def-link .md-def-name, .footnotes .md-def-title {
+    display: inline;
+}
+.footnotes {
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+// KBD按键样式
+kbd {
+    font: var(--code-font);
+    font-size: .8em;
+    background: var(--bg-color);
+    color: var(--body-color);
+    border-radius: 5px;
+}
 
 // 自定义 ====================================================================
 
