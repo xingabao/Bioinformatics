@@ -443,7 +443,7 @@ plugins:
   # Aplayer. See https://github.com/DIYgod/APlayer
   aplayer:
     enable: true # Whether to enable
-    type: mini # fixed, mini
+    type: fixed # fixed, mini
     audios:
       - name: Call of Silence # audio name
         artist: 澤野弘之 # audio artist
