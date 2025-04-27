@@ -5,6 +5,14 @@ tags: [docker]
 categories: [[术语介绍, docker]]
 ---
 
+
+---
+title: docker 技术入门与实战
+date: 2021-05-09 14:49:23
+tags: [docker]
+categories: [[术语介绍, docker]]
+---
+
 # Docker 与容器
 
 ## 什么是 Docker ?
@@ -50,7 +58,7 @@ Docker 是基于 Go 语言实现的开源容器项目，它诞生于 2013 年年
 
 **Docker 容器技术与传统虚拟机技术的比较**：
 
-<img src="../../images/Docker容器技术与传统虚拟机技术的比较.png" align="left" width="80%">
+<img src="/imgs/3ff552af22381e4fa65df8920651d10c.png align="left" width="80%">
 
 ## 核心概念
 
