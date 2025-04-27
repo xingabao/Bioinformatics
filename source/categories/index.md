@@ -1,5 +1,5 @@
 ---
 title: Categories
-comment: true
+comments: true
 date: 2025-04-23 21:16:23
 ---
