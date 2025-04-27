@@ -66,7 +66,7 @@ global:
       family:  # Font family
       url:  # Font URL to CSS file
   # Content max width
-  content_max_width: 1400px
+  content_max_width: 1200px
   # Sidebar width
   sidebar_width: 360px
   # Effects on mouse hover
@@ -307,7 +307,7 @@ articles:
   # Author label
   author_label: 
     enable: true # Whether to enable
-    auto: false # Whether to automatically add author label, e.g. Lv1, Lv2, Lv3...
+    auto: true # Whether to automatically add author label, e.g. Lv1, Lv2, Lv3...
     list: []
   # Code block settings
   code_block:
