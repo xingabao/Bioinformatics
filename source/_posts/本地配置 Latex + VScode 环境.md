@@ -2,7 +2,7 @@
 title: 本地配置 Latex + VScode 环境
 date: 2025-04-23 22:11:45
 tags: [Latex, VScode]
-categories: [Latex]
+categories: [[安装说明, Latex]]
 ---
 https://blog.csdn.net/zheliku/article/details/146968842
 
