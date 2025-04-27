@@ -51,15 +51,9 @@
         }) %>
     <% } %>
     <% if (theme.global.google_analytics.enable) { %>
-        <!-- Google tag (gtag.js) -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id=<%= theme.global.google_analytics.id %>"></script>
-        <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-
-        gtag('config', '<%= theme.global.google_analytics.id %>');
-        </script>
+        <!-- v6.51.la -->
+		<script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+		<script>LA.init({id:"<%= theme.global.google_analytics.id %>",ck:"<%= theme.global.google_analytics.id %>",autoTrack:true,hashMode:true,screenRecord:true})</script>
     <% } %>
     <!--- Icon Part-->
     <link rel="icon" type="image/png" href="<%= url_for(theme.defaults.favicon) %>" sizes="192x192">

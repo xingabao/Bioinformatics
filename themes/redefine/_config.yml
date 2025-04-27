@@ -97,8 +97,8 @@ global:
     description: Hexo Theme Redefine, Redefine Your Hexo Journey.
   # Google Analytics
   google_analytics:
-    enable: false # Whether to enable Google Analytics
-    id: 'G-DCP8BNNXHF' # Google Analytics Measurement ID
+    enable: true # Whether to enable Google Analytics
+    id: '3M0Byj9eibuDkwFA' # Google Analytics Measurement ID
 # SITE CUSTOMIZATION <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< end
     
 
