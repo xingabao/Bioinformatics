@@ -99,6 +99,7 @@ global:
   google_analytics:
     enable: true # Whether to enable Google Analytics
     id: '3M0Byj9eibuDkwFA' # Google Analytics Measurement ID
+	tjnid: '775147011672788992'
 # SITE CUSTOMIZATION <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< end
     
 
