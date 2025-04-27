@@ -450,11 +450,21 @@ plugins:
         url: /audios/Call of Silence.mp3 # audio url
         cover: /audios/Call of Silence.jpg # audio cover url
         lrc: /audios/Call of Silence.lrc # audio cover lrc
-#      - name: # audio name
-#        artist: # audio artist
-#        url: # audio url
-#        cover: # audio cover url
-#        lrc: # audio cover lrc
+      - name: 桃花诺
+        artist: G.E.M.邓紫棋
+        url: /audios/桃花诺.mp3
+        cover: /audios/桃花诺.jpg
+        lrc: /audios/桃花诺.lrc
+      - name: 就是哪吒
+        artist: 唐汉霄
+        url: /audios/就是哪吒.mp3
+        cover: /audios/就是哪吒.jpg
+        lrc: /audios/就是哪吒.lrc
+      - name: 跳楼机
+        artist: LBI利比
+        url: /audios/跳楼机.mp3
+        cover: /audios/跳楼机.jpg
+        lrc: /audios/跳楼机.lrc
       # .... you can add more audios here
   # Mermaid JS. Requires hexo-filter-mermaid-diagrams (npm i hexo-filter-mermaid-diagrams). See https://mermaid.js.org/
   mermaid:
