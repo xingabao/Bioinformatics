@@ -1,12 +1,12 @@
 ---
-title: 本地配置 Latex + VScode 环境
+title: 本地配置 Latex + Visual Studio Code 环境
 date: 2025-04-23 22:11:45
-tags: [Latex, VScode]
-categories: [[安装说明, Latex]]
+tags: [Latex, Visual Studio Code]
+categories: [[安装说明, Latex], [安装说明, Visual Studio Code]]
 ---
 https://blog.csdn.net/zheliku/article/details/146968842
 
-要在本地配置 LaTeX 和 VS Code 环境，首先需要安装一个 LaTeX 发行版（如 TeX Live、MikTeX 或 MacTeX），它提供了编译 LaTeX 文件所需的工具；然后安装 VS Code 编辑器，并添加 LaTeX Workshop 插件，这个插件可以帮助你进行代码高亮、自动补全、实时预览等操作。安装完成后，需要在 VS Code 的设置中配置 LaTeX 的编译工具链，并选择适合的编译流程（如 `pdflatex` 或 `xelatex`）。最后，通过创建一个 `.tex` 文件编写测试文档，保存后插件会自动编译，生成 PDF 文件，你可以直接在 VS Code 中查看输出结果。如果需要支持中文，可以使用 `ctex` 宏包，确保正确安装中文字体相关的包。这样，一个简单高效的 LaTeX 工作环境就搭建完成了！
+要在本地配置 LaTeX 和 Visual Studio Code 环境，首先需要安装一个 LaTeX 发行版（如 TeX Live、MikTeX 或 MacTeX），它提供了编译 LaTeX 文件所需的工具；然后安装 VS Code 编辑器，并添加 LaTeX Workshop 插件，这个插件可以帮助你进行代码高亮、自动补全、实时预览等操作。安装完成后，需要在 VS Code 的设置中配置 LaTeX 的编译工具链，并选择适合的编译流程（如 `pdflatex` 或 `xelatex`）。最后，通过创建一个 `.tex` 文件编写测试文档，保存后插件会自动编译，生成 PDF 文件，你可以直接在 VS Code 中查看输出结果。如果需要支持中文，可以使用 `ctex` 宏包，确保正确安装中文字体相关的包。这样，一个简单高效的 LaTeX 工作环境就搭建完成了！
 
 # 安装 Latex 环境
 
@@ -57,11 +57,11 @@ https://blog.csdn.net/zheliku/article/details/146968842
 
 安装成功之后，就可以将下载的安装包以及解压出来的中间文件清理掉啦。
 
-# 安装 VScode 环境
+# 安装 Visual Studio Code 环境
 
 ## 下载安装包
 
-打开 VScode 官网：[https://code.visualstudio.com/](https://code.visualstudio.com/)，下载安装包。
+打开 Visual Studio Code 官网：[https://code.visualstudio.com/](https://code.visualstudio.com/)，下载安装包。
 
 <img src='/imgs/wechat_2025-04-24_151248_280.png'>
 
@@ -87,7 +87,7 @@ https://blog.csdn.net/zheliku/article/details/146968842
 
 ## 安装插件及环境配置
 
-### 汉化 VScode (可选)
+### 汉化 Visual Studio Code (可选)
 
 一些小伙伴不习惯英文界面，可以通过以下步骤进行汉化操作。
 
