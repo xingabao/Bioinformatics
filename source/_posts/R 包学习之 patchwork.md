@@ -10,10 +10,14 @@ categories: [R]
 
 # 介绍
 
-**patchwork** 是一个专为 R
-语言设计的绘图组合工具包，它的目标是使将多个单独的 **ggplot** 与
-`gridExtra::grid.arrange()` 和 `cowplot::plot_grid()` 类似，但
-**patchwork** 设计鼓励探索和迭代，并且能够扩展到任意复杂的布局。
+<p>
+<b>patchwork</b> 是一个专为 R
+语言设计的绘图组合工具包，它的目标是使将多个单独的 <b>ggplot</b> 与
+<font style="background-color:#F5864F">gridExtra::grid.arrange()</font>
+和 <font style="background-color:#F5864F">cowplot::plot_grid()</font>
+类似，但 <b>patchwork</b>
+设计鼓励探索和迭代，并且能够扩展到任意复杂的布局。
+</p>
 
 # 安装
 
