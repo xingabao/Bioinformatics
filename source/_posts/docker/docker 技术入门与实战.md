@@ -2,7 +2,7 @@
 title: docker 技术入门与实战
 date: 2021-05-09 14:49:23
 tags: [docker]
-categories: [[术语介绍, docker]]
+categories: [[概念介绍, docker]]
 ---
 
  Docker是一组平台即服务（PaaS）的产品。它基于操作系统层级的虚拟化技术，将软件与其依赖项打包为容器。托管容器的软件称为 Docker 引擎。Docker能够帮助开发者在轻量级容器中自动部署应用程序，并使得不同容器中的应用程序彼此隔离，高效工作。该服务有免费和高级版本，它于 2013 年首次发布，由 Docker, Inc. 开发。
