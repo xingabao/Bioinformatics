@@ -1,7 +1,7 @@
 ---
-title: DoWhy - Python 中的因果推断库 (整理中...)
+title: Python 中的因果推断库 - DoWhy (整理中...)
 date: 2025-04-28 15:33:31
-tags: [因果推断]
+tags: [Python, 因果推断, DoWhy]
 categories: [[Python, 因果推断]]
 ---
 
