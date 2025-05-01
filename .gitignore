@@ -1,9 +1,11 @@
 .DS_Store
 Thumbs.db
 DEVELOP.md
+Learning.md
 db.json
 *.log
 node_modules/
+Articles/
 src/
 public/
 .deploy*/
