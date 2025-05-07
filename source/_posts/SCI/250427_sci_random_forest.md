@@ -1,5 +1,5 @@
 ---
-title: 250427_sci_random_forest
+title: 跟着顶刊学分析之随机森林
 date: 2025-04-27 13:22:55
 tags: [R, 机器学习, 随机森林]
 categories: [[跟着顶刊学分析, 随机森林]]

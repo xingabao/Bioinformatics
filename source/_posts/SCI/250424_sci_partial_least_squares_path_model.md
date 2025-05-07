@@ -1,5 +1,5 @@
 ---
-title: 250424_sci_partial_least_squares_path_model
+title: 跟着顶刊学分析之偏最小二乘路径建模
 date: 2025-04-24 10:00:00
 tags: [R, 偏最小二乘路径建模, 因果推断]
 categories: [[跟着顶刊学分析, 偏最小二乘路径建模]]
