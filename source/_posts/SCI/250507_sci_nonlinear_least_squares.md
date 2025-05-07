@@ -1,8 +1,8 @@
 ---
 title: 跟着顶刊学分析之非线性最小二乘法
 date: 2025-05-08 00:01:20
-tags: [R, Non-linear Least Squares]
-categories: [[跟着顶刊学分析, Non-linear Least Squares]]
+tags: [R, 非线性最小二乘法]
+categories: [[跟着顶刊学分析, 非线性最小二乘法]]
 ---
 
 
@@ -243,4 +243,36 @@ nlsLM.plot = function(dat) {
 png(glue('{wkdir}/{no}.png'), width = 6, height = 6, units = 'in', res = 300)
 res = nlsLM.plot(dat = spp)
 dev.off()
+```
+
+# 版本信息
+
+``` r
+sessionInfo()
+## R version 4.4.3 (2025-02-28 ucrt)
+## Platform: x86_64-w64-mingw32/x64
+## Running under: Windows 11 x64 (build 26100)
+## 
+## Matrix products: default
+## 
+## 
+## locale:
+## [1] LC_COLLATE=Chinese (Simplified)_China.utf8  LC_CTYPE=Chinese (Simplified)_China.utf8    LC_MONETARY=Chinese (Simplified)_China.utf8 LC_NUMERIC=C                               
+## [5] LC_TIME=Chinese (Simplified)_China.utf8    
+## 
+## time zone: Asia/Shanghai
+## tzcode source: internal
+## 
+## attached base packages:
+## [1] grid      stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## other attached packages:
+## [1] minpack.lm_1.2-4 Hmisc_5.2-3      glue_1.8.0      
+## 
+## loaded via a namespace (and not attached):
+##  [1] gtable_0.3.6      dplyr_1.1.4       compiler_4.4.3    rpart_4.1.24      tidyselect_1.2.1  htmlTable_2.4.3   stringr_1.5.1     gridExtra_2.3     cluster_2.1.8     scales_1.3.0     
+## [11] yaml_2.3.10       fastmap_1.2.0     ggplot2_3.5.1     R6_2.6.1          generics_0.1.3    Formula_1.2-5     knitr_1.50        htmlwidgets_1.6.4 backports_1.5.0   checkmate_2.3.2  
+## [21] tibble_3.2.1      munsell_0.5.1     nnet_7.3-20       pillar_1.10.1     rlang_1.1.5       stringi_1.8.7     xfun_0.51         cli_3.6.4         magrittr_2.0.3    digest_0.6.37    
+## [31] rstudioapi_0.17.1 base64enc_0.1-3   lifecycle_1.0.4   vctrs_0.6.5       data.table_1.17.0 evaluate_1.0.3    colorspace_2.1-1  foreign_0.8-88    rmarkdown_2.29    tools_4.4.3      
+## [41] pkgconfig_2.0.3   htmltools_0.5.8.1
 ```

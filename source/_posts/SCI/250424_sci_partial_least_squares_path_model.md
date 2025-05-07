@@ -1,8 +1,8 @@
 ---
 title: 250424_sci_partial_least_squares_path_model
 date: 2025-04-24 10:00:00
-tags: [R, PLS-PM, 因果推断]
-categories: [[跟着顶刊学分析, PLS-PM]]
+tags: [R, 偏最小二乘路径建模, 因果推断]
+categories: [[跟着顶刊学分析, 偏最小二乘路径建模]]
 ---
 
 
@@ -522,4 +522,34 @@ innerplot(dat_pls, lcol = 'grey5')
 
 # 生成外模型图
 outerplot(dat_pls, lcol = 'grey9', arr.width = 0.05, box.size = 0.1)
+```
+
+# 版本信息
+
+``` r
+sessionInfo()
+## R version 4.4.3 (2025-02-28 ucrt)
+## Platform: x86_64-w64-mingw32/x64
+## Running under: Windows 11 x64 (build 26100)
+## 
+## Matrix products: default
+## 
+## 
+## locale:
+## [1] LC_COLLATE=Chinese (Simplified)_China.utf8  LC_CTYPE=Chinese (Simplified)_China.utf8    LC_MONETARY=Chinese (Simplified)_China.utf8 LC_NUMERIC=C                               
+## [5] LC_TIME=Chinese (Simplified)_China.utf8    
+## 
+## time zone: Asia/Shanghai
+## tzcode source: internal
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## other attached packages:
+## [1] plspm_0.5.1
+## 
+## loaded via a namespace (and not attached):
+##  [1] digest_0.6.37     fastmap_1.2.0     cellranger_1.1.0  shape_1.4.6.1     xfun_0.51         readxl_1.4.5      magrittr_2.0.3    turner_0.1.9      glue_1.8.0        tibble_3.2.1     
+## [11] knitr_1.50        pkgconfig_2.0.3   htmltools_0.5.8.1 rmarkdown_2.29    lifecycle_1.0.4   cli_3.6.4         amap_0.8-20       vctrs_0.6.5       compiler_4.4.3    rstudioapi_0.17.1
+## [21] tools_4.4.3       tester_0.2.0      pillar_1.10.1     evaluate_1.0.3    yaml_2.3.10       rlang_1.1.5       diagram_1.6.5
 ```
