@@ -74,12 +74,12 @@ suppressMessages(suppressWarnings(library(ggplot2)))
 suppressMessages(suppressWarnings(library(patchwork)))
 
 # 用于存放模型以及画图必须信息
-models <- list()
+models = list()
 xs = list()
 ys = list()
 
 # 数据加载
-Result_data <- openxlsx::read.xlsx("data/10.1038nc2025.xlsx", sheet = "Fig1 to Fig6", startRow = 23)  
+Result_data = openxlsx::read.xlsx("data/10.1038nc2025.xlsx", sheet = "Fig1 to Fig6", startRow = 23)  
 
 # 查看数据格式
 str(Result_data)
@@ -126,7 +126,7 @@ summary(Result_data)
 
 ``` r
 # 建立线性混合效应模型，MAT 为固定效应，Site 为随机效应
-model1 <- lmer(LRRPL ~ MAT + (1|Site), data = Result_data)
+model1 = lmer(LRRPL ~ MAT + (1|Site), data = Result_data)
 
 # 保存模型到列表中，用于后续画图
 models[[1]] = model1
@@ -190,7 +190,7 @@ performance::r2(model1)
 
 ``` r
 # 用线性混合效应模型拟合数据
-model2 <- lmer(LRRPL ~ MAP + (1|Site), data = Result_data)
+model2 = lmer(LRRPL ~ MAP + (1|Site), data = Result_data)
 
 # 保存模型到列表中，用于后续画图
 models[[2]] = model2
@@ -242,7 +242,7 @@ performance::r2(model2)
 
 ``` r
 # 用线性混合效应模型拟合数据
-model3 <- lmer(LRRbiomass ~ MAT + (1|Site), Result_data)
+model3 = lmer(LRRbiomass ~ MAT + (1|Site), Result_data)
 
 # 保存模型到列表中，用于后续画图
 models[[3]] = model3
@@ -298,7 +298,7 @@ performance::r2(model3)
 
 ``` r
 # 用线性混合效应模型拟合数据
-model4 <- lmer(LRRbiomass ~ MAP + (1|Site), Result_data)
+model4 = lmer(LRRbiomass ~ MAP + (1|Site), Result_data)
 
 # 保存模型到列表中，用于后续画图
 models[[4]] = model4
@@ -354,7 +354,7 @@ performance::r2(model4)
 
 ``` r
 # 用线性混合效应模型拟合数据
-model5 <- lmer(LRRPL ~ LRRbiomass + (1|Site), Result_data)
+model5 = lmer(LRRPL ~ LRRbiomass + (1|Site), Result_data)
 
 # 保存模型到列表中，用于后续画图
 models[[5]] = model5
@@ -417,26 +417,26 @@ xlabs[[3]] = expression(MAT ~ (degree*C)); ylabs[[3]] = "LRR herbaceous biomass"
 xlabs[[4]] = "MAP (mm)"; ylabs[[4]] = "LRR herbaceous biomass"
 xlabs[[5]] = "LRR herbaceous biomass"; ylabs[[5]] = "LRR pathogen load"
 
-fig.alb <- list()
+fig.alb = list()
 for (index in 1:length(models)) {
   
   model = models[[index]]
   xlab = xlabs[[index]]
   ylab = ylabs[[index]]
   
-  F_value <- round(anova(model)$`F value`[1], 3)
-  p_ <- anova(model)$`Pr(>F)`[1]
-  p_value <- ifelse(p_ < 0.001, "*P* < 0.001", sprintf("*P* = %.3f", p_))
+  F_value = round(anova(model)$`F value`[1], 3)
+  p_ = anova(model)$`Pr(>F)`[1]
+  p_value = ifelse(p_ < 0.001, "*P* < 0.001", sprintf("*P* = %.3f", p_))
   
-  R2_marginal <- round(performance::r2(model)$R2_marginal, 3)
+  R2_marginal = round(performance::r2(model)$R2_marginal, 3)
   
-  stat_text <- paste0(
+  stat_text = paste0(
     "*F*<sub>1,239</sub> = ", F_value,"<br>",
     p_value, "<br>",
     "*R*<sup>2</sup> = ", R2_marginal
   )
   
-  ert <- ggplot(Result_data, aes(x = .data[[xs[[index]]]], y = .data[[ys[[index]]]])) +
+  ert = ggplot(Result_data, aes(x = .data[[xs[[index]]]], y = .data[[ys[[index]]]])) +
     geom_point(
       alpha = 0.45, 
       size = 4, 
@@ -466,7 +466,7 @@ for (index in 1:length(models)) {
   patchwork::plot_annotation(tag_levels = 'a')
 ```
 
-![](/imgs/f8fde6ae211668b81ea26dda29d4c04f.svg)
+![](/imgs/3eb9fd400fa8c177d70371e28fc8eba2.png)
 # 代码简洁版
 
 ``` r
@@ -477,18 +477,18 @@ suppressMessages(suppressWarnings(library(lmerTest)))
 suppressMessages(suppressWarnings(library(ggplot2)))
 suppressMessages(suppressWarnings(library(patchwork)))
 
-no <- basename(dirname(rstudioapi::getActiveDocumentContext()$path))
-wkdir <- dirname(rstudioapi::getActiveDocumentContext()$path)
+no = basename(dirname(rstudioapi::getActiveDocumentContext()$path))
+wkdir = dirname(rstudioapi::getActiveDocumentContext()$path)
 setwd(wkdir)
 
 # 用于存放模型以及画图必须信息
-models <- list()
+models = list()
 xs = list()
 ys = list()
 
 # 数据加载
-# Result_data <- openxlsx::read.xlsx("data/10.1038nc2025.xlsx", sheet = "Fig1 to Fig6", startRow = 23)  
-Result_data <- openxlsx::read.xlsx("E:/BaiduSyncdisk/005.Bioinformatics/Bioinformatics/src/data/10.1038nc2025.xlsx", sheet = "Fig1 to Fig6", startRow = 23)  
+# Result_data = openxlsx::read.xlsx("data/10.1038nc2025.xlsx", sheet = "Fig1 to Fig6", startRow = 23)  
+Result_data = openxlsx::read.xlsx("E:/BaiduSyncdisk/005.Bioinformatics/Bioinformatics/src/data/10.1038nc2025.xlsx", sheet = "Fig1 to Fig6", startRow = 23)  
 
 # 查看数据格式
 str(Result_data)
@@ -498,7 +498,7 @@ summary(Result_data)
  
 # Fig.2a
 # 建立线性混合效应模型，MAT 为固定效应，Site 为随机效应
-model1 <- lmer(LRRPL ~ MAT + (1|Site), data = Result_data)
+model1 = lmer(LRRPL ~ MAT + (1|Site), data = Result_data)
 
 # 保存模型到列表中，用于后续画图
 models[[1]] = model1
@@ -523,7 +523,7 @@ anova(model1)
 performance::r2(model1)
 
 # Fig.2b
-model2 <- lmer(LRRPL ~ MAP + (1|Site), data = Result_data)
+model2 = lmer(LRRPL ~ MAP + (1|Site), data = Result_data)
 models[[2]] = model2
 xs[[2]] = 'MAP'
 ys[[2]] = 'LRRPL'
@@ -532,7 +532,7 @@ anova(model2)
 performance::r2(model2)
 
 # Fig.2c
-model3 <- lmer(LRRbiomass ~ MAT + (1|Site), Result_data)
+model3 = lmer(LRRbiomass ~ MAT + (1|Site), Result_data)
 models[[3]] = model3
 xs[[3]] = 'MAT'
 ys[[3]] = 'LRRbiomass'
@@ -541,7 +541,7 @@ anova(model3)
 performance::r2(model3)
 
 # Fig.2d
-model4 <- lmer(LRRbiomass ~ MAP + (1|Site), Result_data)
+model4 = lmer(LRRbiomass ~ MAP + (1|Site), Result_data)
 models[[4]] = model4
 xs[[4]] = 'MAP'
 ys[[4]] = 'LRRbiomass'
@@ -550,7 +550,7 @@ anova(model4)
 performance::r2(model4)
 
 # Fig.2e
-model5 <- lmer(LRRPL ~ LRRbiomass + (1|Site), Result_data)
+model5 = lmer(LRRPL ~ LRRbiomass + (1|Site), Result_data)
 models[[5]] = model5
 xs[[5]] = 'LRRPL'
 ys[[5]] = 'LRRbiomass'
@@ -567,26 +567,26 @@ xlabs[[3]] = expression(MAT ~ (degree*C)); ylabs[[3]] = "LRR herbaceous biomass"
 xlabs[[4]] = "MAP (mm)"; ylabs[[4]] = "LRR herbaceous biomass"
 xlabs[[5]] = "LRR herbaceous biomass"; ylabs[[5]] = "LRR pathogen load"
 
-fig.alb <- list()
+fig.alb = list()
 for (index in 1:length(models)) {
   
   model = models[[index]]
   xlab = xlabs[[index]]
   ylab = ylabs[[index]]
   
-  F_value <- round(anova(model)$`F value`[1], 3)
-  p_ <- anova(model)$`Pr(>F)`[1]
-  p_value <- ifelse(p_ < 0.001, "*P* < 0.001", sprintf("*P* = %.3f", p_))
+  F_value = round(anova(model)$`F value`[1], 3)
+  p_ = anova(model)$`Pr(>F)`[1]
+  p_value = ifelse(p_ < 0.001, "*P* < 0.001", sprintf("*P* = %.3f", p_))
   
-  R2_marginal <- round(performance::r2(model)$R2_marginal, 3)
+  R2_marginal = round(performance::r2(model)$R2_marginal, 3)
   
-  stat_text <- paste0(
+  stat_text = paste0(
     "*F*<sub>1,239</sub> = ", F_value,"<br>",
     p_value, "<br>",
     "*R*<sup>2</sup> = ", R2_marginal
   )
   
-  ert <- ggplot(Result_data, aes(x = .data[[xs[[index]]]], y = .data[[ys[[index]]]])) +
+  ert = ggplot(Result_data, aes(x = .data[[xs[[index]]]], y = .data[[ys[[index]]]])) +
     geom_point(
       alpha = 0.45, 
       size = 4, 
@@ -611,9 +611,43 @@ for (index in 1:length(models)) {
   fig.alb[[index]] = ert
 }
 
-gg <- (fig.alb[[1]] | fig.alb[[2]] | patchwork::plot_spacer()) /
+gg = (fig.alb[[1]] | fig.alb[[2]] | patchwork::plot_spacer()) /
   (fig.alb[[3]] | fig.alb[[4]] | fig.alb[[5]]) + 
   patchwork::plot_annotation(tag_levels = 'a')
 
 ggsave(gg, filename = paste0(wkdir, '/LMM.png'), width = 11, height = 7, dpi = 300, device = 'png', bg = '#FFFFFF')
+```
+
+# 版本信息
+
+``` r
+sessionInfo()
+## R version 4.4.3 (2025-02-28 ucrt)
+## Platform: x86_64-w64-mingw32/x64
+## Running under: Windows 11 x64 (build 26100)
+## 
+## Matrix products: default
+## 
+## 
+## locale:
+## [1] LC_COLLATE=Chinese (Simplified)_China.utf8  LC_CTYPE=Chinese (Simplified)_China.utf8    LC_MONETARY=Chinese (Simplified)_China.utf8 LC_NUMERIC=C                               
+## [5] LC_TIME=Chinese (Simplified)_China.utf8    
+## 
+## time zone: Asia/Shanghai
+## tzcode source: internal
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## other attached packages:
+## [1] patchwork_1.3.0 ggplot2_3.5.1   lmerTest_3.1-3  lme4_1.1-37     Matrix_1.7-2    dplyr_1.1.4    
+## 
+## loaded via a namespace (and not attached):
+##  [1] generics_0.1.3      xml2_1.3.8          stringi_1.8.7       lattice_0.22-6      digest_0.6.37       magrittr_2.0.3      evaluate_1.0.3      grid_4.4.3          fastmap_1.2.0      
+## [10] zip_2.3.2           ggtext_0.1.2        mgcv_1.9-1          scales_1.3.0        numDeriv_2016.8-1.1 reformulas_0.4.0    Rdpack_2.6.3        cli_3.6.4           rlang_1.1.5        
+## [19] rbibutils_2.3       performance_0.13.0  litedown_0.6        commonmark_1.9.5    munsell_0.5.1       splines_4.4.3       withr_3.0.2         yaml_2.3.10         tools_4.4.3        
+## [28] nloptr_2.2.1        minqa_1.2.8         colorspace_2.1-1    boot_1.3-31         vctrs_0.6.5         R6_2.6.1            lifecycle_1.0.4     stringr_1.5.1       MASS_7.3-64        
+## [37] insight_1.1.0       pkgconfig_2.0.3     pillar_1.10.1       openxlsx_4.2.8      gtable_0.3.6        glue_1.8.0          Rcpp_1.0.14         xfun_0.51           tibble_3.2.1       
+## [46] tidyselect_1.2.1    rstudioapi_0.17.1   knitr_1.50          farver_2.1.2        htmltools_0.5.8.1   nlme_3.1-167        labeling_0.4.3      rmarkdown_2.29      compiler_4.4.3     
+## [55] markdown_2.0        gridtext_0.1.5
 ```
