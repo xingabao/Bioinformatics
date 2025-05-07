@@ -68,10 +68,10 @@ Ascomycota、Actinobacteriota 和 Gemmatimonadota
 suppressMessages(suppressWarnings(library(plspm)))
 
 # 数据加载
-growth <- data.frame(readxl::read_excel("data/41467_2024_53753_MOESM4_ESM.xlsx"))
+growth = data.frame(readxl::read_excel("data/41467_2024_53753_MOESM4_ESM.xlsx"))
 
 # 从`growth`数据框中选择特定的列，创建一个新的数据框`semdata`
-semdata <- growth[, c("MBCtoP", "MBNtoP", "F_genome_size", "B_genome_size",
+semdata = growth[, c("MBCtoP", "MBNtoP", "F_genome_size", "B_genome_size",
                       "optimum_tmp", "rrn_copy_number", "AI", "MAT", "pH",
                       "CS", "SOC", "TN", "TP", "DOC", "AvaiN",
                       "Ascomycota", "Actinobacteriota", "Gemmatimonadota",
@@ -130,18 +130,18 @@ head(semdata)
 # 1.减少数据的偏斜度，使数据分布更接近正态分布
 # 2.稳定变量的方差，减少异方差性
 # 3.线性化非线性关系，便于后续的统计分析
-semdata$AI <- log(semdata$AI)
-semdata$SOC <- log(semdata$SOC)
-semdata$TN <- log(semdata$TN)
-semdata$TP <- log(semdata$TP)
-semdata$DOC <- log(semdata$DOC)
-semdata$AvaiN <- log(semdata$AvaiN)
-semdata$RelGrowth <- log(semdata$RelGrowth)
+semdata$AI = log(semdata$AI)
+semdata$SOC = log(semdata$SOC)
+semdata$TN = log(semdata$TN)
+semdata$TP = log(semdata$TP)
+semdata$DOC = log(semdata$DOC)
+semdata$AvaiN = log(semdata$AvaiN)
+semdata$RelGrowth = log(semdata$RelGrowth)
 
 # 数据标准化，使每个变量的均值为 0，标准差为 1
 # 1.消除变量之间的量纲差异（例如，温度和碳含量单位不同）
 # 2.确保所有变量在模型中具有相等的权重，避免某些变量因数值范围大而在分析中占据主导地位
-semdata <- data.frame(scale(semdata))
+semdata = data.frame(scale(semdata))
 ```
 
 ## 定义潜在变量块
@@ -150,7 +150,7 @@ semdata <- data.frame(scale(semdata))
 # 定义潜在变量块
 # 定义偏最小二乘路径模型 (PLS-PM) 中的潜在变量块，每个块包含一组相关的观测变量
 # 在 PLS-PM 中，潜在变量是不可直接观测的概念，通过一组观测变量来表示
-dat_blocks <- list(
+dat_blocks = list(
   MAT = c("MAT"),
   AI = c("AI"),
   Soil = c("CS", "pH"),
@@ -173,19 +173,19 @@ dat_blocks <- list(
 
 ``` r
 # 定义路径矩阵
-MAT <- c(0, 0, 0, 0, 0, 0, 0)
-AI <- c(0, 0, 0, 0, 0, 0, 0)
-Soil <- c(1, 1, 0, 0, 0, 0, 0)
-Resources <- c(1, 1, 1, 0, 0, 0, 0)
-Structure <- c(1, 1, 1, 1, 0, 0, 0)
-Traits <- c(1, 0, 0, 1, 1, 0, 0)
-Growth <- c(0, 1, 0, 1, 0, 1, 0)
+MAT = c(0, 0, 0, 0, 0, 0, 0)
+AI = c(0, 0, 0, 0, 0, 0, 0)
+Soil = c(1, 1, 0, 0, 0, 0, 0)
+Resources = c(1, 1, 1, 0, 0, 0, 0)
+Structure = c(1, 1, 1, 1, 0, 0, 0)
+Traits = c(1, 0, 0, 1, 1, 0, 0)
+Growth = c(0, 1, 0, 1, 0, 1, 0)
 
 # 定义潜在变量块之间的路径关系，即内模型
 # 路径矩阵是一个方阵，行和列对应于潜在变量块，矩阵中的值表示块之间的关系
 
-dat_path <- rbind(MAT, AI, Soil, Resources, Structure, Traits, Growth)
-colnames(dat_path) <- rownames(dat_path)
+dat_path = rbind(MAT, AI, Soil, Resources, Structure, Traits, Growth)
+colnames(dat_path) = rownames(dat_path)
 
 dat_path
 ##           MAT AI Soil Resources Structure Traits Growth
@@ -211,7 +211,7 @@ dat_path
 # 拟合 PLS-PM 模型
 # 使用 plspm 函数拟合偏最小二乘路径模型
 # 输出 dat_pls 是一个包含模型结果的对象，包括路径系数、内模型、外模型等信息
-dat_pls <- plspm(semdata, dat_path, dat_blocks)
+dat_pls = plspm(semdata, dat_path, dat_blocks)
 
 # 查看模型输出，提供模型的整体摘要
 # 这些输出帮助研究者理解模型的拟合质量、变量之间的关系以及每个观测变量对其所属块的贡献
@@ -468,10 +468,10 @@ GoF）为 0.5503，低于理想值 0.7，但仍表明模型具有一定的解释
 suppressMessages(suppressWarnings(library(plspm)))
 
 # 数据加载
-growth <- data.frame(readxl::read_excel("data/41467_2024_53753_MOESM4_ESM.xlsx"))
+growth = data.frame(readxl::read_excel("data/41467_2024_53753_MOESM4_ESM.xlsx"))
 
 # 从`growth`数据框中选择特定的列，创建一个新的数据框`semdata`
-semdata <- growth[, c("MBCtoP", "MBNtoP", "F_genome_size", "B_genome_size",
+semdata = growth[, c("MBCtoP", "MBNtoP", "F_genome_size", "B_genome_size",
                       "optimum_tmp", "rrn_copy_number", "AI", "MAT", "pH",
                       "CS", "SOC", "TN", "TP", "DOC", "AvaiN",
                       "Ascomycota", "Actinobacteriota", "Gemmatimonadota",
@@ -479,19 +479,19 @@ semdata <- growth[, c("MBCtoP", "MBNtoP", "F_genome_size", "B_genome_size",
                       "RelGrowth")]
 
 # 对数变换
-semdata$AI <- log(semdata$AI)
-semdata$SOC <- log(semdata$SOC)
-semdata$TN <- log(semdata$TN)
-semdata$TP <- log(semdata$TP)
-semdata$DOC <- log(semdata$DOC)
-semdata$AvaiN <- log(semdata$AvaiN)
-semdata$RelGrowth <- log(semdata$RelGrowth)
+semdata$AI = log(semdata$AI)
+semdata$SOC = log(semdata$SOC)
+semdata$TN = log(semdata$TN)
+semdata$TP = log(semdata$TP)
+semdata$DOC = log(semdata$DOC)
+semdata$AvaiN = log(semdata$AvaiN)
+semdata$RelGrowth = log(semdata$RelGrowth)
 
 # 数据标准化
-semdata <- data.frame(scale(semdata))
+semdata = data.frame(scale(semdata))
 
 # 定义潜在变量块
-dat_blocks <- list(
+dat_blocks = list(
   MAT = c("MAT"),
   AI = c("AI"),
   Soil = c("CS", "pH"),
@@ -501,18 +501,18 @@ dat_blocks <- list(
   Growth = "RelGrowth")
 
 # 定义路径矩阵
-MAT <- c(0, 0, 0, 0, 0, 0, 0)
-AI <- c(0, 0, 0, 0, 0, 0, 0)
-Soil <- c(1, 1, 0, 0, 0, 0, 0)
-Resources <- c(1, 1, 1, 0, 0, 0, 0)
-Structure <- c(1, 1, 1, 1, 0, 0, 0)
-Traits <- c(1, 0, 0, 1, 1, 0, 0)
-Growth <- c(0, 1, 0, 1, 0, 1, 0)
-dat_path <- rbind(MAT, AI, Soil, Resources, Structure, Traits, Growth)
-colnames(dat_path) <- rownames(dat_path)
+MAT = c(0, 0, 0, 0, 0, 0, 0)
+AI = c(0, 0, 0, 0, 0, 0, 0)
+Soil = c(1, 1, 0, 0, 0, 0, 0)
+Resources = c(1, 1, 1, 0, 0, 0, 0)
+Structure = c(1, 1, 1, 1, 0, 0, 0)
+Traits = c(1, 0, 0, 1, 1, 0, 0)
+Growth = c(0, 1, 0, 1, 0, 1, 0)
+dat_path = rbind(MAT, AI, Soil, Resources, Structure, Traits, Growth)
+colnames(dat_path) = rownames(dat_path)
 
 # 拟合 PLS-PM 模型
-dat_pls <- plspm(semdata, dat_path, dat_blocks)
+dat_pls = plspm(semdata, dat_path, dat_blocks)
 
 # 查看模型输出，提供模型的整体摘要
 summary(dat_pls)
