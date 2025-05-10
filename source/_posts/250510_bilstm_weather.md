@@ -382,7 +382,7 @@ print("向后预测的值:", predicted)
 series_1 = y_pred*(df_max - df_min) + df_min
 series_2 = np.array(predicted)*(df_max - df_min) + df_min
 
-plt.figure(figsize = (15,4), dpi = 300)
+plt.figure(figsize = (15, 12), dpi = 300)
 
 plt.subplot(3 ,1, 1)
 plt.plot(train_set, color = 'c', label = 'Training Data')
@@ -564,7 +564,7 @@ print("向后预测的值:", predicted)
 series_1 = y_pred*(df_max - df_min) + df_min
 series_2 = np.array(predicted)*(df_max - df_min) + df_min
 
-plt.figure(figsize = (15,4), dpi = 300)
+plt.figure(figsize = (15, 12), dpi = 300)
 
 plt.subplot(3 ,1, 1)
 plt.plot(train_set, color = 'c', label = 'Training Data')
@@ -1287,7 +1287,7 @@ if __name__ == '__main__':
     series_1 = y_pred*(df_max - df_min) + df_min
     series_2 = np.array(predicted)*(df_max - df_min) + df_min
 
-    plt.figure(figsize = (15,4), dpi = 300)
+    plt.figure(figsize = (15, 12), dpi = 300)
     
     plt.subplot(3 ,1, 1)
     plt.plot(train_set, color = 'c', label = 'Training Data')
