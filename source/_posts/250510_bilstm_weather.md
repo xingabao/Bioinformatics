@@ -307,17 +307,8 @@ plt.show()
 ### 使用模型对测试集进行预测
 
 ``` python
-y_pred = model.predict(X_test)
+y_pred = model.predict(X_test, verbose = verbose)
 ```
-
-    ## 
-    ## [1m 1/75[0m [37m━━━━━━━━━━━━━━━━━━━━[0m [1m9s[0m 126ms/step
-    ## [1m20/75[0m [32m━━━━━[0m[37m━━━━━━━━━━━━━━━[0m [1m0s[0m 3ms/step  
-    ## [1m38/75[0m [32m━━━━━━━━━━[0m[37m━━━━━━━━━━[0m [1m0s[0m 3ms/step
-    ## [1m54/75[0m [32m━━━━━━━━━━━━━━[0m[37m━━━━━━[0m [1m0s[0m 3ms/step
-    ## [1m73/75[0m [32m━━━━━━━━━━━━━━━━━━━[0m[37m━[0m [1m0s[0m 3ms/step
-    ## [1m75/75[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m0s[0m 4ms/step
-    ## [1m75/75[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m0s[0m 4ms/step
 
 ### 计算模型性能指标
 
@@ -492,17 +483,8 @@ plt.show()
 ### 使用模型对测试集进行预测
 
 ``` python
-y_pred = model.predict(X_test)
+y_pred = model.predict(X_test, verbose = verbose)
 ```
-
-    ## 
-    ## [1m 1/75[0m [37m━━━━━━━━━━━━━━━━━━━━[0m [1m9s[0m 132ms/step
-    ## [1m18/75[0m [32m━━━━[0m[37m━━━━━━━━━━━━━━━━[0m [1m0s[0m 3ms/step  
-    ## [1m36/75[0m [32m━━━━━━━━━[0m[37m━━━━━━━━━━━[0m [1m0s[0m 3ms/step
-    ## [1m55/75[0m [32m━━━━━━━━━━━━━━[0m[37m━━━━━━[0m [1m0s[0m 3ms/step
-    ## [1m73/75[0m [32m━━━━━━━━━━━━━━━━━━━[0m[37m━[0m [1m0s[0m 3ms/step
-    ## [1m75/75[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m0s[0m 4ms/step
-    ## [1m75/75[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m0s[0m 4ms/step
 
 ### 计算模型性能指标
 
@@ -1053,32 +1035,25 @@ import matplotlib.pyplot as plt
 from sklearn import metrics
 from sklearn.metrics import r2_score
 from sklearn.preprocessing import MinMaxScaler
-from tensorflow.keras.layers import Reshape
-from tensorflow.keras.models import Sequential, Model
+from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Bidirectional, Dense
-from tensorflow.keras.layers import Conv1D, MaxPooling1D, Flatten
-from tensorflow.keras.layers import Add
+from tensorflow.keras.layers import Conv1D, MaxPooling1D, Reshape, Flatten
 
-# 定义一个函数，用于检测是否支持 GPU 加速运算
-def check_tensorflow_gpu():
-    print("TensorFlow 版本:", tf.__version__)
-    if tf.test.is_gpu_available():
-        print("GPU is available")
-    else:
-        print("GPU is not available, using CPU")
-
-# 定义一个函数，用于对数据进行归一化处理
-def normalize_dataframe(DFTrain, DFTest):
-    # 创建 MinMaxScaler 对象，用于将数据归一化到 [0, 1] 范围
+# 定义一个函数，对输入的训练集、验证集和测试集进行数据归一化处理
+def normalize_dataframe(train_set, val_set, test_set):
+    # 初始化`MinMaxScaler`对象，用于将数据归一化到 [0, 1] 范围
     scaler = MinMaxScaler()
     # 在训练集上拟合归一化模型，计算每个特征的最小值和最大值
-    scaler.fit(DFTrain)
-    # 对训练集和测试集应用归一化变换，并保留原始数据的列名和索引
-    train_data = pd.DataFrame(scaler.transform(DFTrain), columns = DFTrain.columns, index = DFTrain.index)
-    test_data = pd.DataFrame(scaler.transform(DFTest), columns = DFTest.columns, index = DFTest.index)
+    # 这一步不会对训练集，仅记录归一化参数
+    scaler.fit(train_set)
+    # 使用训练集拟合的归一化模型对训练集、验证集和测试集进行转换
+    # 转换后的数据保持原有的列名和索
+    train = pd.DataFrame(scaler.transform(train_set), columns = train_set.columns, index = train_set.index)
+    val = pd.DataFrame(scaler.transform(val_set), columns = val_set.columns, index = val_set.index)
+    test = pd.DataFrame(scaler.transform(test_set), columns = test_set.columns, index = test_set.index)
     
-    # 返回归一化后的训练集和测试集
-    return train_data, test_data
+    # 返回归一化后的训练集、验证集和测试集
+    return train, val, test
 
 # 定义一个函数，用于准备时间序列数据，将其转换为适合模型输入的格式
 def prepare_data(data, win_size):
@@ -1090,13 +1065,14 @@ def prepare_data(data, win_size):
         # 提取一个时间窗口的数据作为输入
         temp_x = data[i:i + win_size]
         # 提取时间窗口后的数据作为目标值
-        temp_y = data[i + win_size]
+        temp_y = data[i + win_size]    
         X.append(temp_x)
         y.append(temp_y)
-
+        
     # 将列表转换为 numpy 数组，便于后续模型输入
     X = np.asarray(X)
     y = np.asarray(y)
+    X = np.expand_dims(X, axis = -1)
     
     # 返回输入特征和目标值
     return X, y
@@ -1107,72 +1083,114 @@ if __name__ == '__main__':
     
     # 全局环境变量
     win_size = 30                 # 准备时间序列数据，设置时间窗口大小为 30
-    tra_val_ratio = 0.7           # 测试和训练集比例
     epoch_size = 10               # 设置 epoch 次数为 10（这里测试设置值较小，具体根据实际设置）
     batch_size = 32               # 设置批量大小
     verbose = 0                   # 是否打印中间过程，0 表示静默状态
+    train_ratio = 0.7             # 训练集比例
+    val_ratio = 0.1               # 验证集比例
+    test_ratio = 0.2              # 测试集比例
     
     # 设置工作目录
-    wkdir = 'E:/BaiduSyncdisk/005.Bioinformatics/Bioinformatics/src/250508_multiple_timeseries_model'
+    wkdir = 'E:/BaiduSyncdisk/005.Bioinformatics/Bioinformatics/src/250510_bilstm_weather'
     os.chdir(wkdir)
     
     # 设置随机种子
     SEED = 42
     random.seed(SEED)
     np.random.seed(SEED)
-    tf.set_random_seed(SEED)
+    tf.random.set_seed(SEED)   
     
     # 增强 TensorFlow 的确定性
     os.environ['TF_DETERMINISTIC_OPS'] = '1'
     os.environ['TF_CUDNN_DETERMINISTIC'] = '1'
-
+    
     # 加载数据
-    # 读取 Excel 文件，设置第一列为索引，并解析日期列
-    DF = pd.read_excel('data/data.xlsx', index_col = 0, parse_dates = ['日期'])
-    # 提取`平均氣溫`列作为研究对象
-    DF = DF[['平均氣溫']]
-    # 划分训练集和测试集
-    DFTrain = DF[DF.index < '2020-01-01']
-    DFTest = DF[DF.index >= '2020-01-01']
+    df = pd.read_csv('data/weather.csv')
+    df['Date'] = pd.to_datetime(df['Year'].astype(str) + '-' + df['Day'].astype(str), format = '%Y-%j')
+    df.set_index('Date', inplace = True)
+    df.drop(['Year', 'Day'], axis = 1, inplace = True)
+    col = 'Temperature'
+    df = df[[col]]
+    
+    # 生成时间范围
+    start_date = pd.Timestamp('1990-01-01')
+    end_date = pd.Timestamp('2023-03-01')
+    date_range = pd.date_range(start = start_date, end = end_date, freq = 'D')
+    
+    # 检查时间范围中是否包含 DataFrame 中的所有日期
+    missing_dates = date_range[~date_range.isin(df.index)]
+    print("Missing Dates:")
+    print(missing_dates)
 
-    # 可视化训练集和测试集数据
+    # 可视化数据集
     plt.figure(figsize = (15, 5))
-    plt.subplot(1, 2, 1)
-    plt.plot(DFTrain['平均氣溫'], color = 'b',  alpha = 0.5)
-    plt.title('Train Data')
-    plt.xticks(rotation = 0)
-    plt.grid(True)
-    plt.subplot(1, 2, 2)
-    plt.plot(DFTest['平均氣溫'], color = 'r',  alpha = 0.5)
-    plt.title('Test Data')
-    plt.grid(True)
+    plt.plot(df[col], color = '#00A087',  alpha = 0.3)
+    plt.title('')
     plt.xticks(rotation = 0)
     plt.show()
 
-    # 对训练集和测试集进行归一化处理
-    data_train, data_test = normalize_dataframe(DFTrain, DFTest)
+    # 数据处理
+    # 计算划分的索引
+    train_split = int(train_ratio * len(df))
+    val_split = int((train_ratio + val_ratio) * len(df))
     
-    # 准备时间序列数据，设置时间窗口大小为 30
-    X, y = prepare_data(data_train.values, win_size)
+    # 划分数据集
+    train_set = df.iloc[:train_split]
+    val_set = df.iloc[train_split:val_split]
+    test_set = df.iloc[val_split:]
+
+    # 可视化训练集, 验证集和测试集数据
+    plt.figure(figsize = (15, 10))
+    plt.subplot(3, 1, 1)
+    plt.plot(train_set, color = 'g',  alpha = 0.3)
+    plt.title('Training Data')
     
-    # 划分训练集和验证集，当值为 0.7 则表示 70% 为训练集，30% 为验证集
-    train_size = int(len(X) * tra_val_ratio)  
+    plt.subplot(3, 1, 2)
+    plt.plot(val_set, color = 'b',  alpha = 0.3)
+    plt.title('Validation Data')
     
-    # 划分训练集和验证集的输入特征
-    X_train, X_val = X[:train_size], X[train_size:]
+    plt.subplot(3, 1, 3)
+    plt.plot(test_set, color = 'r',  alpha = 0.3)
+    plt.title('Testing Data')
+    plt.xticks(rotation = 0)
+    plt.show()
     
-    # 划分训练集和验证集的目标值
-    y_train, y_val = y[:train_size], y[train_size:]
+    # 对训练集, 验证集和测试集进行归一化处理
+    train, val, test = normalize_dataframe(train_set, val_set, test_set)
     
-    # 准备测试集数据，将测试数据转换为模型输入格式
-    X_test, y_test = prepare_data(data_test.values, win_size)
+    # 可视化归一化后的训练集, 验证集和测试集数据
+    plt.figure(figsize = (15, 10))
+    plt.subplot(3, 1, 1)
+    plt.plot(train, color = 'g',  alpha = 0.3)
+    plt.title('Training Data')
     
-    # 打印各数据集的形状，便于检查
+    plt.subplot(3, 1, 2)
+    plt.plot(val, color = 'b',  alpha = 0.3)
+    plt.title('Validation Data')
+    
+    plt.subplot(3, 1, 3)
+    plt.plot(test, color = 'r',  alpha = 0.3)
+    plt.title('Testing Data')
+    plt.xticks(rotation = 0)
+    plt.show()
+    
+    # 训练集
+    X_train, y_train = prepare_data(train['Temperature'].values, win_size)
+    
+    # 验证集
+    X_val, y_val= prepare_data(val['Temperature'].values, win_size)
+    
+    # 测试集
+    X_test, y_test = prepare_data(test['Temperature'].values, win_size)
+    
+    df_max = list(np.max(train_set))[0]
+    df_min = list(np.min(train_set))[0]
+
     print("训练集形状:", X_train.shape, y_train.shape)
     print("验证集形状:", X_val.shape, y_val.shape)
     print("测试集形状:", X_test.shape, y_test.shape)
-
-    # 构建 Bi-LSTM 模型，双向长短时记忆网络
+      
+    # 双向长短时记忆网络
     if False:
         
         # 创建一个顺序模型
@@ -1188,73 +1206,9 @@ if __name__ == '__main__':
         # 输出层，1 个神经元，用于预测单个数值；使用 sigmoid 激活函数，将输出限制在 0 到 1 之间
         model.add(Dense(1, activation = 'sigmoid'))
     
-    # 构建 1D CNN 模型，一维卷积神经网络
-    elif False:
-        
-        # 创建一个顺序模型
-        model = Sequential()
-        # 添加一维卷积层`Conv1D`，64 个卷积核（过滤器），每个卷积核会提取不同的特征
-        # 卷积核的大小为 7，表示每次卷积操作覆盖 7 个时间步（适用于时间序列数据）
-        # 使用`ReLU`激活函数，引入非线性，增强模型的学习能力
-        model.add(Conv1D(filters = 64, kernel_size = 7, activation = 'relu', input_shape = (X_train.shape[1], X_train.shape[2])))
-        # 添加一维最大池化层，池化窗口大小为 2，表示将输入数据的大小减半（下采样），提取主要特征，减少计算量
-        model.add(MaxPooling1D(pool_size = 2))
-        # 添加展平层，将多维输入，例如卷积层输出的特征图展平成一维向量，以便后续全连接层处理
-        model.add(Flatten())
-        # 添加全连接层，32 个神经元，relu 激活函数
-        model.add(Dense(32, activation = 'relu'))
-        # 添加全连接层，16 个神经元，relu 激活函数
-        model.add(Dense(16, activation = 'relu'))
-        # 输出层，1 个神经元，用于预测单个数值；使用 sigmoid 激活函数，将输出限制在 0 到 1 之间
-        model.add(Dense(1, activation = 'sigmoid'))
-       
-    # 构建混合神经网络模型，结合了 Bi-LSTM 和 1D CNN 两个模型
-    elif False:
-        
-        # 创建一个顺序模型
-        model = Sequential()
-        # 添加双向长短期记忆层，分别从正向和反向处理输入序列，捕捉序列中前后依赖关系
-        # 每个方向有 128 个隐藏单元，因此总共 256 个隐藏单元
-        # 使用激活函数 ReLU，引入非线性，增强模型的学习能力
-        model.add(Bidirectional(LSTM(128, activation = 'relu'), input_shape = (X_train.shape[1], X_train.shape[2])))
-        # 添加重塑层，将`Bi-LSTM`的输出重塑为形状为`(256, 1)`的二维张量
-        # 这一步是为了将`Bi-LSTM`输出调整为适合后续`1D CNN`层处理的形状
-        model.add(Reshape((256, 1)))
-        # 添加一维卷积层`Conv1D`，64 个卷积核（过滤器），每个卷积核会提取不同的特征
-        # 卷积核的大小为 7，表示每次卷积操作覆盖 7 个时间步（适用于时间序列数据）
-        # 使用`ReLU`激活函数，引入非线性，增强模型的学习能力
-        model.add(Conv1D(filters = 64, kernel_size = 7, activation = 'relu'))
-        # 添加一维最大池化层，池化窗口大小为 2，表示将输入数据的大小减半（下采样），提取主要特征，减少计算量
-        model.add(MaxPooling1D(pool_size = 2))
-        # 添加展平层，将多维输入，例如卷积层输出的特征图展平成一维向量，以便后续全连接层处理
-        model.add(Flatten())
-        # 添加全连接层，32 个神经元，relu 激活函数
-        model.add(Dense(32, activation = 'relu'))
-        # 添加全连接层，16 个神经元，relu 激活函数
-        model.add(Dense(16, activation = 'relu'))
-        # 输出层，1 个神经元，用于预测单个数值；使用 sigmoid 激活函数，将输出限制在 0 到 1 之间
-        model.add(Dense(1, activation = 'sigmoid'))
-        
-    # 构建混合神经网络模型，结合了 Bi-LSTM 和 1D CNN 以及残差网络
+    # 混合神经网络模型
     else:
         
-        # 定义残差块函数
-        def residual_block(input_layer, filters, kernel_size):
-            # 第一个卷积层
-            # `filters`，指定卷积核数量，定义特征提取的维度
-            # `kernel_size`，卷积核大小，定义每次卷积操作覆盖的时间步长
-            # `activation = 'relu'`，激活函数，使用`RuLU`激活函数，引入非线性
-            # `padding = 'same'`，使用 same 填充，确保输出形状与输入形状相同，便于残差连接
-            residual = Conv1D(filters = filters, kernel_size = kernel_size, activation = 'relu', padding = 'same')(input_layer)
-            # 第二个卷积层
-            # 继续进行特征处理，参数与第一个卷积层相同
-            residual = Conv1D(filters = filters, kernel_size = kernel_size, activation = 'relu', padding = 'same')(residual)
-            # 残差连接，将输入层与经过两个卷积层处理的输出相加，形成残差连接
-            # 残差拼接有助于缓解梯度消失问题，增强深层网络的训练效果
-            residual = Add()([input_layer, residual])
-            
-            return residual
-
         # 创建一个顺序模型
         model = Sequential()
         # 添加双向长短期记忆层，分别从正向和反向处理输入序列，捕捉序列中前后依赖关系
@@ -1270,30 +1224,19 @@ if __name__ == '__main__':
         model.add(Conv1D(filters = 64, kernel_size = 7, activation = 'relu'))
         # 添加一维最大池化层，池化窗口大小为 2，表示将输入数据的大小减半（下采样），提取主要特征，减少计算量
         model.add(MaxPooling1D(pool_size = 2))
-        # 获取当前模型的中间输出，用于后续残差块的输入
-        intermediate_output = model.layers[-1].output
-        # 调用残差块函数，构建残差块
-        # 将`MaxPooling1D()`的输入传入残差块
-        residual_output = residual_block(model.layers[-1].output, filters = 64, kernel_size = 7)
-        # 对残差块输出进行最大池化操作，继续下采样，进一步减少维度
-        residual_output = MaxPooling1D(pool_size = 2)(residual_output)
-        # 添加展平层，将多维输入展平成一维向量，以便后续全连接层处理
-        residual_output = Flatten()(residual_output)
+        # 添加展平层，将多维输入，例如卷积层输出的特征图展平成一维向量，以便后续全连接层处理
+        model.add(Flatten())
         # 添加全连接层，32 个神经元，relu 激活函数
-        residual_output = Dense(32, activation = 'relu')(residual_output)
+        model.add(Dense(32, activation = 'relu'))
         # 添加全连接层，16 个神经元，relu 激活函数
-        residual_output = Dense(16, activation = 'relu')(residual_output)
+        model.add(Dense(16, activation = 'relu'))
         # 输出层，1 个神经元，用于预测单个数值；使用 sigmoid 激活函数，将输出限制在 0 到 1 之间
-        output_layer = Dense(1, activation = 'sigmoid')(residual_output)
-        # 构建最终模型
-        # 使用`Model`将整个网络连接起来，允许非顺序结构，如残差连接
-        model = Model(inputs = model.input, outputs = output_layer)
-    
+        model.add(Dense(1, activation = 'sigmoid'))
         
     # 编译模型，优化器为 adam，损失函数为均方误差 (mse)
     model.compile(optimizer = 'adam', loss = 'mse')
     
-    # 训练模型，设置 epoch 次数为 10，批量大小为 32，使用验证集评估模型
+    # 训练模型，设置 epoch 次数为 10（这里测试设置值较小，具体根据实际设置），批量大小为 32，使用验证集评估模型
     history = model.fit(X_train, y_train, epochs = epoch_size, batch_size = batch_size, validation_data = (X_val, y_val), verbose = verbose)
     
     # 绘制训练过程中的损失曲线
@@ -1304,7 +1247,7 @@ if __name__ == '__main__':
     plt.show()
     
     # 使用模型对测试集进行预测
-    y_pred = model.predict(X_test)
+    y_pred = model.predict(X_test, verbose = verbose)
     
     # 计算模型性能指标
     # 计算均方误差（MSE）
@@ -1320,42 +1263,52 @@ if __name__ == '__main__':
     print("均方根误差 (RMSE):", rmse)
     print("平均绝对误差 (MAE):", mae)
     print("拟合优度:", r2)
-            
+
     # 打印模型结构摘要
     model.summary()
 
-    # 获取当前环境信息
-    import sys
-    import platform
-    import pkg_resources
+    # 取出预测的最后一个时间步的输出作为下一步的输入
+    last_output = model.predict(X_test, verbose = verbose)[-1]
     
-    def session_info():
-        print("Python Session Information")
-        print("==========================")
-        
-        # Python 版本信息
-        print(f"Python Version: {sys.version}")
-        print(f"Python Implementation: {platform.python_implementation()}")
-        print(f"Python Build: {platform.python_build()}")
-        
-        # 操作系统信息
-        print("\nOperating System Information")
-        print(f"OS: {platform.system()}")
-        print(f"OS Release: {platform.release()}")
-        print(f"OS Version: {platform.version()}")
-        print(f"Machine: {platform.machine()}")
-        print(f"Processor: {platform.processor()}")
-        
-        # 已安装的包及其版本
-        print("\nInstalled Packages")
-        print("------------------")
-        installed_packages = sorted(
-            [(dist.key, dist.version) for dist in pkg_resources.working_set],
-            key=lambda x: x[0].lower()
-        )
-        for package, version in installed_packages:
-            print(f"{package}: {version}")
+    # 预测的时间步数
+    steps = 10  # 假设向后预测 10 个时间步
+    predicted = []
+    for i in range(steps):
+        # 将最后一个输出加入 X_test，继续向后预测
+        input_data = np.append(X_test[-1][1:], last_output).reshape(1, X_test.shape[1], X_test.shape[2])
+        # 使用模型进行预测
+        next_output = model.predict(input_data, verbose = verbose)
+        # 将预测的值加入结果列表
+        predicted.append(next_output[0][0])
+        last_output = next_output[0]
     
-    # 调用函数
-    session_info()
+    print("向后预测的值:", predicted)
+
+    series_1 = y_pred*(df_max - df_min) + df_min
+    series_2 = np.array(predicted)*(df_max - df_min) + df_min
+
+    plt.figure(figsize = (15,4), dpi = 300)
+    
+    plt.subplot(3 ,1, 1)
+    plt.plot(train_set, color = 'c', label = 'Training Data')
+    plt.plot(val_set, color = 'r', label = 'Validation Data')
+    plt.plot(test_set, color = 'b', label = 'Testing Data')
+    plt.plot(pd.date_range(start = '2016-08-12', end = '2023-03-01', freq = 'D'), series_1, color = 'y', label = 'Testing Data Predition')
+    plt.plot(pd.date_range(start = '2023-03-02', end = '2023-03-11', freq = 'D'), series_2, color = 'magenta', linestyle = '-.', label = 'Futrue Prediction')
+    plt.legend()
+    
+    plt.subplot(3, 1, 2)
+    plt.plot(test_set, color = 'b', label = 'Training Data')
+    plt.plot(pd.date_range(start = '2016-08-12', end = '2023-03-01', freq = 'D'), series_1, color = 'y', label = 'Testing Data Predition')
+    plt.plot(pd.date_range(start = '2023-03-02', end = '2023-03-11', freq = 'D'), series_2, color = 'magenta', linestyle = '-.', label = 'Futrue Prediction')
+    plt.legend()
+    
+    plt.subplot(3, 1, 3)
+    plt.plot(test_set, color = 'b', label = 'Training Data')
+    plt.plot(pd.date_range(start = '2016-08-12', end = '2023-03-01', freq = 'D'), series_1, color = 'y', label = 'Testing Data Predition')
+    plt.plot(pd.date_range(start = '2023-03-02', end = '2023-03-11', freq = 'D'), series_2, color = 'magenta', linestyle = '-.', label = 'Futrue Prediction')
+    plt.xlim(pd.Timestamp('2022-01-01'), pd.Timestamp('2023-03-11'))
+    plt.legend()
+    
+    plt.show()
 ```
