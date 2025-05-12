@@ -31,9 +31,8 @@ Kolmogorov–Smirnov statistic indicates the difference between the WT and
 KO distributions for each subtype. The plotted lines show the positional
 density using a 1D kernel density estimate.
 </p>
-
-<strong style="color:#00A087;font-size:16px;">图 d 这个复合图展示了 CT8
-T 细胞 (P14 亚型)与各细胞亚型的空间互作特征</strong>：
+<p><b style="color:#00A087;font-size:16px;">图 d 这个复合图展示了 CT8
+T 细胞 (P14 亚型)与各细胞亚型的空间互作特征:</b></p>
 
 <ul style="margin-top:0;">
 <li style="margin-top:2px;margin-bottom:2px;">
