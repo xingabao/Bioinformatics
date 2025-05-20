@@ -1,6 +1,6 @@
 ---
 title: 跟着顶刊学分析之曼特尔检验
-date: 2025-04-27 13:22:55
+date: 2025-05-19 12:51:16
 tags: [R]
 categories: [[跟着顶刊学分析, 曼特尔检验]]
 ---
@@ -17,9 +17,8 @@ Nathan Mantel 和 William Haenszel 于 1967
 P 值小于预设的显著性水平，则可以拒绝原假设，认为两个矩阵之间存在相关性。
 </p>
 <p>
-
-此外，曼特尔检验的应用不仅局限于生物领域，它同样适用于其他领域如地理学、社会科学等，帮助研究人员揭示不同矩阵之间的潜在联系&lt;/&gt;
-
+此外，曼特尔检验的应用不仅局限于生物领域，它同样适用于其他领域如地理学、社会科学等，帮助研究人员揭示不同矩阵之间的潜在联系
+</p>
 <p>
 本示例参考 iMeta <a href='https://doi.org/10.1002/imt2.224'>Probio-M9, a
 breast milk-originated probiotic, alleviates mastitis and enhances
