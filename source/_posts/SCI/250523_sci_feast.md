@@ -376,8 +376,8 @@ for(it in 1:length(Ids)){
 # 输出结果，获得贡献度
 # 1 - 最后一行结果数据的平均值
 res = data.frame(Proportions_est)
-print(1 - sum(res[nrow(res), ]))
-## [1] -8.7028
+print(1 - mean(unlist(res[nrow(res), ])))
+## [1] 0.4609555
 ```
 
 # 写出到文件
@@ -390,15 +390,16 @@ write.csv(Proportions_est, file = "res.csv", quote = FALSE)
 
 ``` r
 sessionInfo()
-## R version 4.4.1 (2024-06-14 ucrt)
+## R version 4.4.3 (2025-02-28 ucrt)
 ## Platform: x86_64-w64-mingw32/x64
-## Running under: Windows 10 x64 (build 19045)
+## Running under: Windows 11 x64 (build 26100)
 ## 
 ## Matrix products: default
 ## 
 ## 
 ## locale:
-## [1] LC_COLLATE=English_United States.utf8  LC_CTYPE=English_United States.utf8    LC_MONETARY=English_United States.utf8 LC_NUMERIC=C                           LC_TIME=English_United States.utf8    
+## [1] LC_COLLATE=Chinese (Simplified)_China.utf8  LC_CTYPE=Chinese (Simplified)_China.utf8    LC_MONETARY=Chinese (Simplified)_China.utf8 LC_NUMERIC=C                               
+## [5] LC_TIME=Chinese (Simplified)_China.utf8    
 ## 
 ## time zone: Asia/Shanghai
 ## tzcode source: internal
@@ -407,14 +408,14 @@ sessionInfo()
 ## [1] parallel  stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] ggrepel_0.9.6          RcppArmadillo_14.2.0-1 Rcpp_1.0.14            cowplot_1.1.3          ggplot2_3.5.1          reshape2_1.4.4         mgcv_1.9-1             nlme_3.1-166          
-##  [9] doParallel_1.0.17      iterators_1.0.14       foreach_1.5.2          vegan_2.6-8            lattice_0.22-6         permute_0.9-7          dplyr_1.1.4           
+##  [1] ggrepel_0.9.6          RcppArmadillo_14.4.1-1 Rcpp_1.0.14            cowplot_1.1.3          ggplot2_3.5.1          reshape2_1.4.4         mgcv_1.9-1             nlme_3.1-167          
+##  [9] doParallel_1.0.17      iterators_1.0.14       foreach_1.5.2          vegan_2.6-10           lattice_0.22-6         permute_0.9-7          dplyr_1.1.4           
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] Matrix_1.7-1      gtable_0.3.6      compiler_4.4.1    tidyselect_1.2.1  stringr_1.5.1     cluster_2.1.6     scales_1.3.0      splines_4.4.1     yaml_2.3.10       fastmap_1.2.0    
-## [11] R6_2.5.1          plyr_1.8.9        generics_0.1.3    knitr_1.49        MASS_7.3-61       tibble_3.2.1      munsell_0.5.1     pillar_1.10.1     rlang_1.1.4       stringi_1.8.4    
-## [21] xfun_0.49         cli_3.6.3         withr_3.0.2       magrittr_2.0.3    digest_0.6.37     grid_4.4.1        rstudioapi_0.17.1 lifecycle_1.0.4   vctrs_0.6.5       evaluate_1.0.3   
-## [31] glue_1.8.0        codetools_0.2-20  colorspace_2.1-1  rmarkdown_2.29    tools_4.4.1       pkgconfig_2.0.3   htmltools_0.5.8.1
+##  [1] Matrix_1.7-2      gtable_0.3.6      compiler_4.4.3    tidyselect_1.2.1  stringr_1.5.1     cluster_2.1.8     scales_1.3.0      splines_4.4.3     yaml_2.3.10       fastmap_1.2.0    
+## [11] R6_2.6.1          plyr_1.8.9        generics_0.1.4    knitr_1.50        MASS_7.3-64       tibble_3.2.1      munsell_0.5.1     pillar_1.10.2     rlang_1.1.5       stringi_1.8.7    
+## [21] xfun_0.51         cli_3.6.4         withr_3.0.2       magrittr_2.0.3    digest_0.6.37     grid_4.4.3        rstudioapi_0.17.1 lifecycle_1.0.4   vctrs_0.6.5       evaluate_1.0.3   
+## [31] glue_1.8.0        codetools_0.2-20  colorspace_2.1-1  rmarkdown_2.29    tools_4.4.3       pkgconfig_2.0.3   htmltools_0.5.8.1
 ```
 
 # 代码简洁版
@@ -520,7 +521,7 @@ for(it in 1:length(Ids)){
 # 输出结果，获得贡献度
 # 1 - 最后一行结果数据的平均值
 res = data.frame(Proportions_est)
-print(1 - sum(res[nrow(res), ]))
+print(1 - mean(unlist(res[nrow(res), ])))
 
 # 写出到文件
 write.csv(Proportions_est, file = "res.csv", quote = FALSE)
